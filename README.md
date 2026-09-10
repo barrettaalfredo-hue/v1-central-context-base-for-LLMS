@@ -82,7 +82,7 @@ Push bara till er egen gren. Lägg inte feature-kod på `main` eller `integratio
 - Auth/OAuth, databasstruktur, RLS, kö och backenddrift
 - Simulerad minnesmotor med förutbestämda svar
 - Testverktyg som ersätter dashboarden (ingest, lista minnen, hämta kontextpaket, fel)
-- `docs/contracts.md` — gemensam spec för minne, konflikt, kö och kontextpaket (Filip och Melker speglar den)
+- Implementera `docs/contracts.md` (ifyllt **tillsammans innan kod**, se `docs/innan-kod.md`)
 - `docs/desktop-support.md` — vad desktop-apparna faktiskt stöder
 
 **Ska inte ha:** Next.js-dashboard, riktig extraktion/ranking/arkivering
