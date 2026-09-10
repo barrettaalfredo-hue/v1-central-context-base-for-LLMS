@@ -4,6 +4,22 @@ Centralt minnessystem för AI. Context från flera LLM:er samlas på ett ställe
 
 `main` är skyddad utgångspunkt. Tre personer pushar oberoende av varandra. När delarna går att koppla ihop mergas de till `integration/v1`.
 
+## Innan kod — gör detta tillsammans
+
+Ingen skriver app-kod förrän Filip, Alfredo och Melker har gjort **samma workshop**. En halv dag. En skriver, två godkänner. Underlag: [`docs/innan-kod.md`](docs/innan-kod.md) och [`docs/contracts.md`](docs/contracts.md).
+
+Gör **exakt** detta, i den här ordningen:
+
+1. **Välj injektion.** Antingen Claude anropar alltid `get_context`, eller en gateway sätter på kontextpaketet innan anropet går till modellen. Utan valet uppfyller inte MCP produkten.
+2. **Välj klient för V1.** Bevisa Claude Desktop först. ChatGPT Desktop bara om ni tillsammans bekräftat vad appen faktiskt stöder.
+3. **Namnge saknad teknik.** Databas (t.ex. Postgres), kö, relevans i V1 (ämne+tid eller embeddings), extraktionsmodell, auth-provider.
+4. **Fyll `docs/contracts.md` fält för fält.** Minne, konflikt, anslutning, råsamtal, kö, kontextpaket, RLS. Filip mockar filen. Melker speglar den. Alfredo implementerar den.
+5. **Lås auth-gränsen.** Alfredo äger riktig inloggning. Filip mockar samma fält, bygger inte ett eget login-system.
+6. **Skriv demo-scriptet** ni ska klara tillsammans: godkänt samtal in → DB+kö → extraherat minne → syns i dashboard → ny fråga får kort kontextpaket.
+7. **Boka ihopkoppling i mitten av sprinten**, inte bara i slutet. Mergeordning: Alfredo → Melker → Filip.
+
+**Stopp-regel:** tom ruta i `docs/innan-kod.md` = ingen Next.js, FastAPI eller worker ännu.
+
 ## Tech stack (exakt)
 
 | Person | Branch | Tech stack |
