@@ -56,3 +56,5 @@ När minne ska uppdateras: **sök** → ta `id` → `updateMemory`. Du bygger st
 - [ ] Isolering mellan två `user_id` är testad
 - [ ] Instruktionstexten är färdig och kopierbar
 - [ ] Exporten är en TypeScript-modul som Alfredo och Filip kan importera utan att skriva om regler
+
+Torsdag mergas den här grenen till **`integration/v1`** (efter Alfredo, före Filip). Inte direkt till `main`.

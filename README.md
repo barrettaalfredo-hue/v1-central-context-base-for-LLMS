@@ -45,24 +45,30 @@ Flöde vid uppdatering: Claude söker relevant minne, hämtar dess `id`, anropar
 
 ---
 
-## Branches (endast dessa tre)
+## Branches
 
-Alla grenar utgår från **samma startpaket** (det här repot: format, testexempel, gränssnittstester, kodmappar). Gemensamma format ändras bara efter överenskommelse.
+Alla person-grenar utgår från **samma startpaket**. Gemensamma format ändras bara efter överenskommelse. **Ingen feature-kod direkt till `main`.** Torsdag mergas de tre delarna till `integration/v1`, testas där, och går till `main` **först när testerna är godkända**.
 
-| Branch | Person | Arbetar utan andras färdiga kod genom | Måste leverera |
+| Branch | Person | När den används | Måste leverera |
 | --- | --- | --- | --- |
-| [`filip/dashboard`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/filip/dashboard) | Filip | Simulerade API-svar, inloggning och exempelminnen | Se [apps/dashboard/README.md](apps/dashboard/README.md) |
-| [`alfredo/integrations`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/alfredo/integrations) | Alfredo | Förutbestämda minnessvar; bygger riktig Auth, databasåtkomst och MCP | Se [apps/api/README.md](apps/api/README.md) |
-| [`melker/memory`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/melker/memory) | Melker | Testdata och simulerad lagring; bygger regler, sökning och Claude-instruktioner | Se [packages/memory/README.md](packages/memory/README.md) |
+| [`filip/dashboard`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/filip/dashboard) | Filip | Dagligen tills dashboarden är klar mot mock | [apps/dashboard/README.md](apps/dashboard/README.md) |
+| [`alfredo/integrations`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/alfredo/integrations) | Alfredo | Dagligen tills Auth, DB och fjärr-MCP är klara | [apps/api/README.md](apps/api/README.md) |
+| [`melker/memory`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/melker/memory) | Melker | Dagligen tills hjärnan + instruktioner är klara | [packages/memory/README.md](packages/memory/README.md) |
+| [`integration/v1`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/integration/v1) | Alla tre | **Torsdag 17/9 — ihopkoppling och test före `main`** | [docs/torsdag-test.md](docs/torsdag-test.md) + [docs/integration-v1.md](docs/integration-v1.md) |
 
 ```bash
 git fetch origin
-git checkout filip/dashboard
-git checkout alfredo/integrations
-git checkout melker/memory
+git checkout filip/dashboard         # Filip, daglig kod
+git checkout alfredo/integrations    # Alfredo, daglig kod
+git checkout melker/memory           # Melker, daglig kod
+git checkout integration/v1          # bara vid ihopkoppling/test
 ```
 
-Pusha bara till er egen gren. `main` är gemensam bas. Torsdag 17/9 kopplas de tre grenarna ihop och testas enligt [docs/torsdag-test.md](docs/torsdag-test.md).
+```
+filip/dashboard ────────┐
+alfredo/integrations ───┼──► integration/v1 ──(tester godkända)──► main
+melker/memory ──────────┘
+```
 
 ---
 
@@ -107,6 +113,8 @@ Detalj: [docs/claude-koppling.md](docs/claude-koppling.md).
 ---
 
 ## Torsdag 17/9 — testerna som måste klaras
+
+Körs på **`integration/v1`**, inte på `main`. Hur ni mergar: [docs/integration-v1.md](docs/integration-v1.md).
 
 Alla fyra, på riktigt, samma minne, samma konto:
 

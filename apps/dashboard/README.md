@@ -68,3 +68,5 @@ De tre exempelminnena i [docs/testexempel.md](../../docs/testexempel.md) (Lanser
 - [ ] Svenska kategorietiketter stämmer
 - [ ] README i den här mappen förklarar `npm run dev` / Vercel
 - [ ] Ingen kod beror på att Alfredos eller Melkers tjänster körs
+
+Torsdag mergas den här grenen till **`integration/v1`** (efter Alfredo och Melker). Inte direkt till `main`.
