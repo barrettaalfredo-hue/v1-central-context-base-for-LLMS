@@ -1,6 +1,8 @@
 # Innan kod — gör detta tillsammans
 
-Filip, Alfredo och Melker sitter i **samma rum / samma call**. En person skriver, de andra två godkänner. **Ingen app-kod** förrän alla sju punkter har ett valt värde.
+Filip, Alfredo och Melker sitter i **samma rum / samma call**. En person skriver, de andra två godkänner. **Ingen app-kod** förrän alla punkter har ett valt värde.
+
+**Börja här:** läs [`docs/claude-koppling.md`](claude-koppling.md) först. Claude-kopplingen är pipan. Utan den synkar inte tre personer.
 
 Tid: en workshop, ungefär en halv dag. Output: den här filen ifylld + `docs/contracts.md` ifylld. Committa till `main` (eller merga PR:n) **innan** någon pushar feature-kod.
 
