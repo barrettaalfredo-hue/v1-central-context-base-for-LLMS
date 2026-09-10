@@ -6,4 +6,4 @@ Du äger **`apps/api/`** (Next.js-serverfunktioner, fjärr-MCP, Supabase Auth/DB
 
 Självständigt: förutbestämda minnessvar i [docs/testexempel.md](docs/testexempel.md)-form medan Auth, DB och MCP byggs. Format: [docs/contracts.md](docs/contracts.md).
 
-Torsdag 17/9 är MCP/OAuth den riskabla delen. Checklista: [docs/torsdag-test.md](docs/torsdag-test.md).
+**Inte `main`:** torsdag mergas den här grenen **först** in i **`integration/v1`**. Tester: [docs/torsdag-test.md](docs/torsdag-test.md).
