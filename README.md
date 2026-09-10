@@ -4,6 +4,17 @@ Centralt minnessystem för AI. Context från flera LLM:er samlas på ett ställe
 
 `main` är skyddad utgångspunkt. Tre personer pushar oberoende av varandra. När delarna går att koppla ihop mergas de till `integration/v1`.
 
+## Tech stack (exakt)
+
+| Person | Branch | Tech stack |
+| --- | --- | --- |
+| Filip | `filip/dashboard` | Next.js, React, TypeScript, Tailwind, Vercel |
+| Alfredo | `alfredo/integrations` | FastAPI, MCP, klientanslutningar, insamling, Auth/OAuth, databasstruktur, RLS, kö, backenddrift |
+| Melker | `melker/memory-engine` | Python-worker, schemaläggning, Scaleway, extraktion, dubbletter, versionering, konflikter, arkivering, sökning, kontextpaket |
+| Alla tre | `integration/v1` | Alla stackar ovan, ihopkopplade mot samma databas och kö |
+
+Filip bygger också vyer för inloggning, anslutningar, minnen och konflikter, plus en simulerad backend. Alfredo bygger också en simulerad minnesmotor och ett testverktyg. Melker bygger mot samma specifikation som Alfredo (testdatabas och testkö).
+
 ## Branches
 
 | Branch | Ägare | Roll |
@@ -29,9 +40,11 @@ Push bara till er egen gren. Lägg inte feature-kod på `main` eller `integratio
 
 ### `filip/dashboard`
 
+**Tech stack:** Next.js, React, TypeScript, Tailwind, Vercel
+
 **Vad branchen ska ha**
 
-- Next.js-app: React, TypeScript, Tailwind, deploy på Vercel
+- Next.js-app med React, TypeScript och Tailwind, deploy på Vercel
 - Vyer: **inloggning**, **anslutningar** (Claude Desktop / ChatGPT Desktop: ansluten, frånkopplad, fel), **minnen** (enkel sortering ämne + tid), **konflikter**
 - Simulerad backend: exempelminnen, inloggningsstatus, liveuppdateringar, fel (auth nere, tom lista)
 - Mock-API som speglar Alfredos fält (minne, anslutning, konflikt, användare) så vyerna senare bara byter anslutning
@@ -44,9 +57,11 @@ Push bara till er egen gren. Lägg inte feature-kod på `main` eller `integratio
 
 ### `alfredo/integrations`
 
+**Tech stack:** FastAPI, MCP, klientanslutningar, insamling, Auth/OAuth, databasstruktur, RLS, kö, backenddrift
+
 **Vad branchen ska ha**
 
-- FastAPI, MCP, klientanslutningar för Claude Desktop och ChatGPT Desktop
+- FastAPI och MCP, klientanslutningar för Claude Desktop och ChatGPT Desktop
 - Insamling av **godkända** samtal (modellen ska inte själv välja vad som sparas)
 - Auth/OAuth, databasstruktur, RLS, kö och backenddrift
 - Simulerad minnesmotor med förutbestämda svar
@@ -62,9 +77,11 @@ Push bara till er egen gren. Lägg inte feature-kod på `main` eller `integratio
 
 ### `melker/memory-engine`
 
+**Tech stack:** Python-worker, schemaläggning, Scaleway, extraktion, dubbletter, versionering, konflikter, arkivering, sökning, kontextpaket
+
 **Vad branchen ska ha**
 
-- Python-worker, schemaläggning, Scaleway
+- Python-worker, schemaläggning och körning på Scaleway
 - Extraktion ur chattar, enkel sortering (ämne + tid), dubbletter, versionering, konflikter, arkivering
 - Sökning och **korta kontextpaket** till LLM (fråga in → relevant paket ut, inte hela historiken)
 - Exempelchattar, egen testdatabas och testkö enligt **samma spec som Alfredo**
@@ -76,6 +93,8 @@ Push bara till er egen gren. Lägg inte feature-kod på `main` eller `integratio
 ---
 
 ### `integration/v1`
+
+**Tech stack:** Next.js, React, TypeScript, Tailwind, Vercel + FastAPI, MCP, Auth/OAuth, databasstruktur, RLS, kö + Python-worker, schemaläggning, Scaleway, extraktion, dubbletter, versionering, konflikter, arkivering, sökning, kontextpaket
 
 **Vad branchen ska ha (efter merge)**
 
