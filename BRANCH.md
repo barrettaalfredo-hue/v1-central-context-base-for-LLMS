@@ -6,4 +6,4 @@ Du äger **`apps/dashboard/`**. Exakt vad som ska vara klart står i [apps/dashb
 
 Självständigt: simulerade API-svar och exempelminnen från [docs/testexempel.md](docs/testexempel.md). Format: [docs/contracts.md](docs/contracts.md).
 
-Torsdag 17/9 måste din UI kunna visa ett minne Claude just sparat (samma konto). Checklista: [docs/torsdag-test.md](docs/torsdag-test.md).
+**Inte `main`:** torsdag mergas den här grenen till **`integration/v1`** (efter Alfredo och Melker). Tester: [docs/torsdag-test.md](docs/torsdag-test.md).

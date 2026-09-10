@@ -76,3 +76,5 @@ Tills Melker är inkopplad: returnera förutbestämda svar som **bit för bit** 
 - [ ] MCP-URL + OAuth-flöde går att genomföra mot Claude Desktop (eller dokumenterat med screenshot/steg om Desktop strular)
 - [ ] Stockholm-region är satt; ingen publik cache av minnen
 - [ ] Felvägar returnerar `error`, aldrig fejk-lycka
+
+Torsdag mergas den här grenen **först** in i **`integration/v1`**. Inte direkt till `main`.

@@ -1,6 +1,7 @@
 # Torsdag 17 september 2026 — integration och test
 
-Då kopplas `filip/dashboard`, `alfredo/integrations` och `melker/memory` ihop mot samma Supabase och samma minnesfunktioner. En vecka är målet; den riskabla delen är MCP/OAuth.
+Tester körs på branchen **`integration/v1`**, inte på `main`.  
+Merga `filip/dashboard`, `alfredo/integrations` och `melker/memory` dit (ordning: Alfredo → Melker → Filip). En vecka är målet; den riskabla delen är MCP/OAuth. Hur ni mergar: [integration-v1.md](integration-v1.md).
 
 ## Förutsättningar innan ni börjar testa
 
@@ -56,4 +57,4 @@ Då kopplas `filip/dashboard`, `alfredo/integrations` och `melker/memory` ihop m
 
 ## När V1 är levererad
 
-Alla fyra block ovan är godkända av de tre personerna samma dag. Då, inte förr, är enveckas-V1 klar.
+Alla fyra block ovan är godkända av de tre personerna **på `integration/v1`**. Först då mergas `integration/v1` till `main`. Inte förr.
