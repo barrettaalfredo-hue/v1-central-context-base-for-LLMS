@@ -1,11 +1,9 @@
-# Startpaket — grenar
+# Branch `melker/memory`
 
-Det här är `main` / startpaketet. Personliga leveranslistor:
+**Ägare:** Melker. Pusha bara här.
 
-| Branch | README som gäller leverans |
-| --- | --- |
-| `filip/dashboard` | [apps/dashboard/README.md](apps/dashboard/README.md) |
-| `alfredo/integrations` | [apps/api/README.md](apps/api/README.md) |
-| `melker/memory` | [packages/memory/README.md](packages/memory/README.md) |
+Du äger **`packages/memory/`** (TypeScript-hjärnan). Exakt vad som ska vara klart står i [packages/memory/README.md](packages/memory/README.md). Missa inte: validering, spara, uppdatera via id, sök (text + filter, senast uppdaterat först), simulerad lagring, tester mot [docs/testexempel.md](docs/testexempel.md), och Claude-instruktionerna.
 
-Översikt och torsdagskrav: [README.md](README.md).
+Samma funktioner ska användas av både dashboard och MCP efter torsdag. Ingen Python, worker, kö eller vektordb.
+
+Torsdag 17/9: sökning/uppdatering utan identiska dubbletter. Checklista: [docs/torsdag-test.md](docs/torsdag-test.md).
