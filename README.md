@@ -6,11 +6,14 @@ Centralt minnessystem för AI. Context från flera LLM:er samlas på ett ställe
 
 ## Innan kod — gör detta tillsammans
 
-Ingen skriver app-kod förrän Filip, Alfredo och Melker har gjort **samma workshop**. En halv dag. En skriver, två godkänner. Underlag: [`docs/innan-kod.md`](docs/innan-kod.md) och [`docs/contracts.md`](docs/contracts.md).
+Ingen skriver app-kod förrän Filip, Alfredo och Melker har gjort **samma workshop**. En halv dag. En skriver, två godkänner. Underlag: [`docs/claude-koppling.md`](docs/claude-koppling.md), [`docs/innan-kod.md`](docs/innan-kod.md) och [`docs/contracts.md`](docs/contracts.md).
+
+**Börja med Claude-kopplingen** ([`docs/claude-koppling.md`](docs/claude-koppling.md)). Ni planerar inte tre produkter. Ni planerar två anrop (`save_conversation` och `get_context`) och ett JSON-paket. Det paketet **är** synken mellan er. Brancher hindrar bara fil-krockar — de synkar inte data.
 
 Gör **exakt** detta, i den här ordningen:
 
-1. **Välj injektion.** Antingen Claude anropar alltid `get_context`, eller en gateway sätter på kontextpaketet innan anropet går till modellen. Utan valet uppfyller inte MCP produkten.
+0. **Lås Claude-kopplingen tillsammans (30–45 min).** Acceptera att Claude Desktop i V1 anropar `get_context`. Läs `docs/claude-koppling.md`. Fyll kontextpaket + råsamtal i kontraktet. Skriv ett gemensamt test: samma fråga, samma tre minnesrader, som Alfredo hårdkodar, Melker producerar, Filip visar.
+1. **Välj injektion.** För V1: Claude anropar alltid `get_context` (det som Desktop faktiskt tillåter). En egen gateway framför Claude är ett senare projekt.
 2. **Välj klient för V1.** Bevisa Claude Desktop först. ChatGPT Desktop bara om ni tillsammans bekräftat vad appen faktiskt stöder.
 3. **Namnge saknad teknik.** Databas (t.ex. Postgres), kö, relevans i V1 (ämne+tid eller embeddings), extraktionsmodell, auth-provider.
 4. **Fyll `docs/contracts.md` fält för fält.** Minne, konflikt, anslutning, råsamtal, kö, kontextpaket, RLS. Filip mockar filen. Melker speglar den. Alfredo implementerar den.
