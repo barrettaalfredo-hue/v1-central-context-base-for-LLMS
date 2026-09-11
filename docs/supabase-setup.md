@@ -37,6 +37,6 @@ Projekt: `v1-central-context-base-for-llms`. Settings → Environment Variables.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Settings → API → `anon` `public` | Preview, Production |
 | `SUPABASE_SERVICE_ROLE_KEY` | Settings → API → `service_role` **secret** | Preview, Production. **Aldrig** `NEXT_PUBLIC_` |
 
-Efter att variablerna är satta: Redeploy av `alfredo/integrations`-preview.
+Efter att variablerna är satta: sätt **Root Directory** till `apps/api` och Redeploy av `alfredo/integrations`-preview.
 
 Skicka till teamet: **ref + preview-URL**. Inte nycklar.
