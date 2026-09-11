@@ -1,15 +1,13 @@
 import { randomToken } from "@/lib/oauth/crypto";
+import { asMcpSession, type McpSession } from "@/lib/oauth/session-parse";
 import { accessTokenExpiresIn } from "@/lib/oauth/tokens";
 import { createSupabaseAnonClient } from "@/lib/supabase/clients";
 
+export type { McpSession } from "@/lib/oauth/session-parse";
+export { asMcpSession } from "@/lib/oauth/session-parse";
+
 export const MCP_ACCESS_SECONDS = 8 * 60 * 60;
 export const MCP_REFRESH_SECONDS = 30 * 24 * 60 * 60;
-
-export type McpSession = {
-  user_id: string;
-  supabase_access: string;
-  supabase_refresh: string;
-};
 
 const supabaseRefreshInflight = new Map<string, Promise<{ access: string; refresh: string } | null>>();
 const mcpRefreshInflight = new Map<string, Promise<IssuedTokens | null>>();
@@ -54,10 +52,8 @@ export async function issueMcpTokens(input: {
 export async function getMcpSession(accessToken: string): Promise<McpSession | null> {
   const supabase = createSupabaseAnonClient();
   const { data, error } = await supabase.rpc("oauth_get_session", { p_access: accessToken });
-  if (error || !data || typeof data !== "object") return null;
-  const row = data as McpSession;
-  if (!row.user_id || !row.supabase_access || !row.supabase_refresh) return null;
-  return row;
+  if (error) return null;
+  return asMcpSession(data);
 }
 
 async function refreshSupabase(userId: string, refreshToken: string) {
@@ -104,8 +100,8 @@ export async function rotateMcpRefresh(refreshToken: string): Promise<IssuedToke
       p_access_expires: expiresAt(MCP_ACCESS_SECONDS),
       p_refresh_expires: expiresAt(MCP_REFRESH_SECONDS),
     });
-    if (!error && data && typeof data === "object") {
-      const row = data as McpSession;
+    const row = asMcpSession(data);
+    if (!error && row) {
       return {
         access_token,
         refresh_token: newRefresh,

@@ -30,47 +30,52 @@ async function readParams(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const params = await readParams(request);
-  const grant = String(params.grant_type ?? "");
+  try {
+    const params = await readParams(request);
+    const grant = String(params.grant_type ?? "");
 
-  if (grant === "refresh_token") {
-    const refreshToken = String(params.refresh_token ?? "");
-    if (!refreshToken) {
-      return Response.json({ error: "invalid_request" }, { status: 400, headers: TOKEN_HEADERS });
+    if (grant === "refresh_token") {
+      const refreshToken = String(params.refresh_token ?? "");
+      if (!refreshToken) {
+        return Response.json({ error: "invalid_request" }, { status: 400, headers: TOKEN_HEADERS });
+      }
+      const issued = await rotateMcpRefresh(refreshToken);
+      if (!issued) {
+        return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
+      }
+      return tokenJson(issued);
     }
-    const issued = await rotateMcpRefresh(refreshToken);
-    if (!issued) {
+
+    if (grant !== "authorization_code") {
+      return Response.json({ error: "unsupported_grant_type" }, { status: 400, headers: TOKEN_HEADERS });
+    }
+
+    const code = String(params.code ?? "");
+    const redirectUri = String(params.redirect_uri ?? "");
+    const clientId = String(params.client_id ?? "");
+    const verifier = String(params.code_verifier ?? "");
+    const row = await consumeCode(code);
+
+    if (
+      !row ||
+      row.client_id !== clientId ||
+      row.redirect_uri !== redirectUri ||
+      pkceChallenge(verifier) !== row.code_challenge ||
+      !row.refresh_token
+    ) {
       return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
     }
+
+    const issued = await issueMcpTokens({
+      userId: row.user_id,
+      supabaseAccess: row.access_token,
+      supabaseRefresh: row.refresh_token,
+    });
     return tokenJson(issued);
+  } catch (error) {
+    console.error("oauth_token_failed", error);
+    return Response.json({ error: "server_error" }, { status: 500, headers: TOKEN_HEADERS });
   }
-
-  if (grant !== "authorization_code") {
-    return Response.json({ error: "unsupported_grant_type" }, { status: 400, headers: TOKEN_HEADERS });
-  }
-
-  const code = String(params.code ?? "");
-  const redirectUri = String(params.redirect_uri ?? "");
-  const clientId = String(params.client_id ?? "");
-  const verifier = String(params.code_verifier ?? "");
-  const row = await consumeCode(code);
-
-  if (
-    !row ||
-    row.client_id !== clientId ||
-    row.redirect_uri !== redirectUri ||
-    pkceChallenge(verifier) !== row.code_challenge ||
-    !row.refresh_token
-  ) {
-    return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
-  }
-
-  const issued = await issueMcpTokens({
-    userId: row.user_id,
-    supabaseAccess: row.access_token,
-    supabaseRefresh: row.refresh_token,
-  });
-  return tokenJson(issued);
 }
 
 export function OPTIONS() {
