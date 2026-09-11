@@ -7,7 +7,7 @@ Koden för MCP + OAuth finns på den här grenens PR. Det här kan inte agenten 
 1. `SUPABASE_SERVICE_ROLE_KEY` behövs **inte** längre för Claude-OAuth (koden sparas via inloggat konto).
 2. **Använd inte** `https://v1-central-context-base-for-llms.vercel.app` — det är tom `main` och ger 404.  
    **Använd inte** heller den gamla preview `…-ko0vrc092.vercel.app` — den ger Claude bara ~5 minuters token och kopplingen dör.  
-   MCP-URL är preview-URL:en på **PR #7** (8 timmars access-token). Kopiera den från PR:en, inte från en gammal chatt.  
+   MCP-URL efter merge 11/9 kväll: `https://v1-central-context-base-for-llms-bb720p5c9.vercel.app/api/mcp` (8 timmars access-token). Inte en gammal chatt-URL.  
    `NEXT_PUBLIC_APP_URL` behövs inte för OAuth-host (servern följer den host Claude anropar).
 3. **Deployment Protection:** Standard Protection / Vercel Login **av** på den URL Claude ska använda. Claude kan inte logga in på Vercel-SSO.  
    Settings → Deployment Protection → av för Production (och för den preview ni testar, eller Bypass for Automation räcker **inte** för Claude Desktop).
