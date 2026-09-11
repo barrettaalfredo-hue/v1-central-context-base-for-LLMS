@@ -1,4 +1,5 @@
-import { createSupabaseAdminClient } from "@/lib/supabase/clients";
+import { createSupabaseAnonClient, createSupabaseUserClient } from "@/lib/supabase/clients";
+import { redirectAllowed as uriAllowed } from "./redirect";
 
 export type OAuthClient = {
   client_id: string;
@@ -6,15 +7,12 @@ export type OAuthClient = {
 };
 
 export async function registerClient(redirectUris: string[]) {
-  const admin = createSupabaseAdminClient();
-  const client_id = crypto.randomUUID();
-  const { error } = await admin.schema("private").from("oauth_clients").insert({
-    client_id,
-    redirect_uris: redirectUris,
-    token_endpoint_auth_method: "none",
+  const supabase = createSupabaseAnonClient();
+  const { data, error } = await supabase.rpc("oauth_register_client", {
+    p_redirect_uris: redirectUris,
   });
-  if (error) throw error;
-  return { client_id, redirect_uris: redirectUris };
+  if (error || typeof data !== "string") throw error ?? new Error("register_failed");
+  return { client_id: data, redirect_uris: redirectUris };
 }
 
 export async function getClient(clientId: string): Promise<OAuthClient | null> {
@@ -37,18 +35,19 @@ export async function getClient(clientId: string): Promise<OAuthClient | null> {
     }
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data } = await admin
-    .schema("private")
-    .from("oauth_clients")
-    .select("client_id, redirect_uris")
-    .eq("client_id", clientId)
-    .maybeSingle();
-  return data as OAuthClient | null;
+  const supabase = createSupabaseAnonClient();
+  const { data, error } = await supabase.rpc("oauth_get_client", {
+    p_client_id: clientId,
+  });
+  if (error || !data || typeof data !== "object") return null;
+  const row = data as { client_id?: string; redirect_uris?: string[] };
+  const uris = row.redirect_uris ?? [];
+  if (!row.client_id || !Array.isArray(uris)) return null;
+  return { client_id: row.client_id, redirect_uris: uris };
 }
 
 export function redirectAllowed(client: OAuthClient, redirectUri: string) {
-  return client.redirect_uris.includes(redirectUri);
+  return uriAllowed(client.redirect_uris, redirectUri);
 }
 
 export async function saveCode(row: {
@@ -60,29 +59,27 @@ export async function saveCode(row: {
   refresh_token: string | null;
   user_id: string;
 }) {
-  const admin = createSupabaseAdminClient();
-  const { error } = await admin.schema("private").from("oauth_codes").insert({
-    ...row,
-    expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+  const supabase = createSupabaseUserClient(row.access_token);
+  const { error } = await supabase.rpc("oauth_save_code", {
+    p_code: row.code,
+    p_client_id: row.client_id,
+    p_redirect_uri: row.redirect_uri,
+    p_code_challenge: row.code_challenge,
+    p_access_token: row.access_token,
+    p_refresh_token: row.refresh_token,
+    p_user_id: row.user_id,
   });
   if (error) throw error;
 }
 
 export async function consumeCode(code: string) {
-  const admin = createSupabaseAdminClient();
-  const { data } = await admin
-    .schema("private")
-    .from("oauth_codes")
-    .select(
-      "code, client_id, redirect_uri, code_challenge, access_token, refresh_token, user_id, expires_at",
-    )
-    .eq("code", code)
-    .maybeSingle();
-
-  if (!data) return null;
-  await admin.schema("private").from("oauth_codes").delete().eq("code", code);
-  if (new Date(data.expires_at as string).getTime() < Date.now()) return null;
-  return data as {
+  const supabase = createSupabaseAnonClient();
+  const { data, error } = await supabase.rpc("oauth_consume_code", { p_code: code });
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return null;
+  if (new Date(row.expires_at as string).getTime() < Date.now()) return null;
+  return row as {
     code: string;
     client_id: string;
     redirect_uri: string;

@@ -1,7 +1,14 @@
 import { getClient, redirectAllowed } from "@/lib/oauth/store";
-import { approveMcpAccess } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const ERROR_TEXT: Record<string, string> = {
+  credentials: "Fel mejl eller lösenord.",
+  config: "Servern saknar Supabase-koppling.",
+  client: "Claude-klienten kunde inte verifieras. Starta om Connect i Claude Desktop.",
+  invalid: "Ogiltig OAuth-begäran. Öppna adressen från Claude Desktop, inte direkt.",
+  store: "Inloggningen gick igenom men koden kunde inte sparas. Försök igen.",
+};
 
 export default async function AuthorizePage({
   searchParams,
@@ -14,13 +21,9 @@ export default async function AuthorizePage({
   const state = String(params.state ?? "");
   const codeChallenge = String(params.code_challenge ?? "");
   const method = String(params.code_challenge_method ?? "S256");
+  const email = String(params.email ?? "");
   const errorCode = String(params.error ?? "");
-  const errorText =
-    errorCode === "credentials"
-      ? "Fel mejl eller lösenord."
-      : errorCode
-        ? "Kunde inte godkänna åtkomst."
-        : "";
+  const errorText = ERROR_TEXT[errorCode] ?? (errorCode ? "Kunde inte godkänna åtkomst." : "");
 
   const client = clientId ? await getClient(clientId) : null;
   const ok = client && redirectAllowed(client, redirectUri) && method === "S256" && codeChallenge;
@@ -37,7 +40,7 @@ export default async function AuthorizePage({
           Ogiltig OAuth-begäran. Öppna adressen från Claude Desktop, inte direkt.
         </p>
       ) : (
-        <form className="flex flex-col gap-2" action={approveMcpAccess}>
+        <form className="flex flex-col gap-2" method="post" action="/oauth/approve">
           {errorText ? (
             <p className="rounded border border-red-300 p-3 text-sm">{errorText}</p>
           ) : null}
@@ -52,6 +55,7 @@ export default async function AuthorizePage({
             name="email"
             autoComplete="username"
             placeholder="e-post"
+            defaultValue={email}
             required
           />
           <input
