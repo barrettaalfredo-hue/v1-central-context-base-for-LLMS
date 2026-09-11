@@ -22,6 +22,7 @@ Det här är **Alfredos** gren, inte dashboarden. Filip bygger UI. Melker bygger
 | Vercel-projekt kopplat till **det här** GitHub-repot, funktioner `arn1` | Klart |
 | Next.js-API i `apps/api`: login, session, logout, save/search/update | Klart och deployat |
 | Identiska dubbletter stoppas per konto. Fel svarar `{ "error": { "code", "message" } }` | Klart |
+| Fjärr-MCP-endpoint `/api/mcp` + OAuth (`/oauth/authorize`, `/oauth/token`) | Kod klar — Alfredo måste klicka i Vercel + Claude Desktop |
 
 Sidan på `/` är **Alfredos testsida** (logga in och spara en testdeadline). **Inte** Filips dashboard. Ta inte den som produkt-UI.
 
@@ -40,11 +41,13 @@ Filip kan anropa samma JSON som i [docs/contracts.md](docs/contracts.md):
 
 Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md).
 
-### Vad som inte funkar än (Alfredos kvar)
+### Vad som inte funkar än (Alfredos klick + Melker)
 
-- Claude Desktop **fjärr-MCP** + OAuth (samma användare som dashboarden). HTTP-JSON ovan är inte Claude-protokollet.
+- Claude Desktop är **inte inkopplad** förrän Alfredo följer [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md) (stäng Vercel Login på preview, sätt `NEXT_PUBLIC_APP_URL`, lägg till connectorn).
 - Melkers paket `packages/memory` är inte inkopplat. API:t har en intern store mot Supabase tills Melker är klar.
 - Torsdagstesterna körs på `integration/v1`, inte här och inte på `main`.
+
+Filip: hur vyerna kopplas den 17:e — [docs/filip-auth.md](docs/filip-auth.md).
 
 ```
 Claude Desktop  ↔  fjärr-MCP (Vercel)  ↔  minnesfunktioner (TypeScript)  ↔  Supabase

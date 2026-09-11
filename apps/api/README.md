@@ -2,7 +2,7 @@
 
 **Person:** Alfredo  
 **Branch:** `alfredo/integrations`  
-**Läge 11/9:** login + minnen mot Stockholm är deployat. Claude-OAuth saknas. Teamstatus: [README.md](../../README.md#läge-11-september-2026--gren-alfredointegrations).  
+**Läge 11/9:** login + minnen deployat. MCP/OAuth-kod finns; Claude Desktop kräver Alfredos klick. [oauth-mcp-alfredos-steg.md](../../docs/oauth-mcp-alfredos-steg.md). Teamstatus: [README.md](../../README.md#läge-11-september-2026--gren-alfredointegrations).  
 **Stack:** Next.js **serverfunktioner** + **MCP SDK/adapter** på **Vercel**; **Supabase** PostgreSQL + Auth/OAuth  
 **Region:** Supabase **Stockholm (`eu-north-1`)**, Vercel-backend **Stockholm (`arn1`)**  
 **Supabase:** projekt `uthkzkvpkkpzrmzjunqq` är skapat. Konton, signup-lås och Vercel-env: [docs/supabase-setup.md](../../docs/supabase-setup.md).  
@@ -32,9 +32,8 @@ npm run dev
 | POST | `/api/memories` och `/api/mcp/save_memory` | `save_memory` |
 | GET | `/api/memories` och POST `/api/mcp/search_memory` | `search_memory` |
 | PATCH | `/api/memories/:id` och POST `/api/mcp/update_memory` | `update_memory` |
-| GET | `/api/health` | env satta, ingen hemlighet |
-
-Claude-OAuth för fjärr-MCP kommer i nästa steg på samma gren. HTTP-JSON ovan är samma tre verktyg.
+| GET | `/api/mcp` (Claude) | Fjärr-MCP, tre verktyg, OAuth |
+| GET | `/oauth/authorize` | Tillfällig OAuth-vy (Filip byter UI senare) |
 
 ## Du måste leverera (annars är backend/MCP inte klar)
 
@@ -99,9 +98,9 @@ Tills Melker är inkopplad: returnera förutbestämda svar som **bit för bit** 
 ## Klart på din gren när
 
 - [x] Tre konton finns; inloggnings-JSON stämmer
-- [ ] RLS-test: Konto B ser inte Konto A (görs mot preview efter Root Directory `apps/api`)
-- [x] MCP `save_memory` / `search_memory` / `update_memory` svarar enligt kontraktet (HTTP-JSON mot riktig DB; Claude-OAuth kvar)
-- [ ] MCP-URL + OAuth-flöde går att genomföra mot Claude Desktop (eller dokumenterat med screenshot/steg om Desktop strular)
+- [ ] RLS-test: Konto B ser inte Konto A — kör `apps/api/scripts/ab-test.mjs` (lösen i env)
+- [x] MCP-verktygen finns som HTTP-JSON **och** `/api/mcp` (Claude-protokoll)
+- [ ] MCP-URL + OAuth i Claude Desktop — [docs/oauth-mcp-alfredos-steg.md](../../docs/oauth-mcp-alfredos-steg.md)
 - [x] Stockholm-region är satt; ingen publik cache av minnen
 - [x] Felvägar returnerar `error`, aldrig fejk-lycka
 
