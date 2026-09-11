@@ -2,6 +2,7 @@
 
 **Person:** Alfredo  
 **Branch:** `alfredo/integrations`  
+**Läge 11/9:** login + minnen mot Stockholm är deployat. Claude-OAuth saknas. Teamstatus: [README.md](../../README.md#läge-11-september-2026--gren-alfredointegrations).  
 **Stack:** Next.js **serverfunktioner** + **MCP SDK/adapter** på **Vercel**; **Supabase** PostgreSQL + Auth/OAuth  
 **Region:** Supabase **Stockholm (`eu-north-1`)**, Vercel-backend **Stockholm (`arn1`)**  
 **Supabase:** projekt `uthkzkvpkkpzrmzjunqq` är skapat. Konton, signup-lås och Vercel-env: [docs/supabase-setup.md](../../docs/supabase-setup.md).  
