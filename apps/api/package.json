@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test lib/memory/validate.test.ts lib/oauth/crypto.test.ts lib/oauth/urls.test.ts lib/oauth/redirect.test.ts lib/supabase/env.test.ts"
+    "test": "tsx --test lib/memory/validate.test.ts lib/oauth/crypto.test.ts lib/oauth/urls.test.ts lib/oauth/redirect.test.ts lib/oauth/tokens.test.ts lib/supabase/env.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
