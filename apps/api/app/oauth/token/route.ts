@@ -1,7 +1,6 @@
 import { pkceChallenge } from "@/lib/oauth/crypto";
 import { consumeCode } from "@/lib/oauth/store";
-import { accessTokenExpiresIn } from "@/lib/oauth/tokens";
-import { createSupabaseAnonClient } from "@/lib/supabase/clients";
+import { issueMcpTokens, rotateMcpRefresh, type IssuedTokens } from "@/lib/oauth/sessions";
 
 export const dynamic = "force-dynamic";
 
@@ -10,13 +9,13 @@ const TOKEN_HEADERS = {
   "Access-Control-Allow-Origin": "*",
 };
 
-function tokenJson(accessToken: string, refreshToken: string | null) {
+function tokenJson(issued: IssuedTokens) {
   return Response.json(
     {
-      access_token: accessToken,
+      access_token: issued.access_token,
       token_type: "Bearer",
-      expires_in: accessTokenExpiresIn(accessToken),
-      refresh_token: refreshToken,
+      expires_in: issued.expires_in,
+      refresh_token: issued.refresh_token,
       scope: "memory",
     },
     { headers: TOKEN_HEADERS },
@@ -31,42 +30,52 @@ async function readParams(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const params = await readParams(request);
-  const grant = String(params.grant_type ?? "");
+  try {
+    const params = await readParams(request);
+    const grant = String(params.grant_type ?? "");
 
-  if (grant === "refresh_token") {
-    const refreshToken = String(params.refresh_token ?? "");
-    if (!refreshToken) {
-      return Response.json({ error: "invalid_request" }, { status: 400, headers: TOKEN_HEADERS });
+    if (grant === "refresh_token") {
+      const refreshToken = String(params.refresh_token ?? "");
+      if (!refreshToken) {
+        return Response.json({ error: "invalid_request" }, { status: 400, headers: TOKEN_HEADERS });
+      }
+      const issued = await rotateMcpRefresh(refreshToken);
+      if (!issued) {
+        return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
+      }
+      return tokenJson(issued);
     }
-    const supabase = createSupabaseAnonClient();
-    const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
-    if (error || !data.session?.access_token) {
+
+    if (grant !== "authorization_code") {
+      return Response.json({ error: "unsupported_grant_type" }, { status: 400, headers: TOKEN_HEADERS });
+    }
+
+    const code = String(params.code ?? "");
+    const redirectUri = String(params.redirect_uri ?? "");
+    const clientId = String(params.client_id ?? "");
+    const verifier = String(params.code_verifier ?? "");
+    const row = await consumeCode(code);
+
+    if (
+      !row ||
+      row.client_id !== clientId ||
+      row.redirect_uri !== redirectUri ||
+      pkceChallenge(verifier) !== row.code_challenge ||
+      !row.refresh_token
+    ) {
       return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
     }
-    return tokenJson(data.session.access_token, data.session.refresh_token);
+
+    const issued = await issueMcpTokens({
+      userId: row.user_id,
+      supabaseAccess: row.access_token,
+      supabaseRefresh: row.refresh_token,
+    });
+    return tokenJson(issued);
+  } catch (error) {
+    console.error("oauth_token_failed", error);
+    return Response.json({ error: "server_error" }, { status: 500, headers: TOKEN_HEADERS });
   }
-
-  if (grant !== "authorization_code") {
-    return Response.json({ error: "unsupported_grant_type" }, { status: 400, headers: TOKEN_HEADERS });
-  }
-
-  const code = String(params.code ?? "");
-  const redirectUri = String(params.redirect_uri ?? "");
-  const clientId = String(params.client_id ?? "");
-  const verifier = String(params.code_verifier ?? "");
-  const row = await consumeCode(code);
-
-  if (
-    !row ||
-    row.client_id !== clientId ||
-    row.redirect_uri !== redirectUri ||
-    pkceChallenge(verifier) !== row.code_challenge
-  ) {
-    return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
-  }
-
-  return tokenJson(row.access_token, row.refresh_token);
 }
 
 export function OPTIONS() {
