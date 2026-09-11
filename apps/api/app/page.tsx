@@ -246,8 +246,8 @@ export default function TestPage() {
         <p className="rounded border p-3 text-sm">Inga minnen för det här kontot ännu.</p>
       ) : (
         <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-black">
-          Logga in med samma e-post som Claude för att se minnen här. Placeholder-adressen
-          alfredo.test@example.com har inga rader.
+          Logga in med samma e-post som Claude för att se minnen här. Minnen visas
+          bara för det inloggade kontot.
         </p>
       )}
 
