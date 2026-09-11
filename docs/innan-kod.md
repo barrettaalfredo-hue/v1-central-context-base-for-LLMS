@@ -35,3 +35,4 @@ Redan i repot:
 - De tre kontonas riktiga e-postadresser (inte committa lösenord)
 - Supabase-projekt-URL och nycklar via miljövariabler, aldrig i git
 - Publik MCP-adress till anslutningsguiden
+- Vercel GitHub-app på kontot `barrettaalfredo-hue` + import av **det här** repot — [vercel-koppling.md](vercel-koppling.md)

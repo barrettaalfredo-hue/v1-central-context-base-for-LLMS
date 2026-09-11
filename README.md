@@ -84,7 +84,7 @@ melker/memory ──────────┘
 | Sökning | Textsökning i titel/innehåll, filter på projekt/kategori, **senast uppdaterat först**. |
 | Uppdatering | Befintligt minne ändras med dess `id`. Ingen historik, ingen automatisk konflikthantering. |
 | Dashboard | Läsning, sökning, filter. Uppdatera **var 10:e sekund** när sidan är aktiv, plus uppdateringsknapp. |
-| Region | Supabase **Stockholm**. Vercel-backend **Stockholm**. Privat innehåll får **inte** cachas publikt eller loggas. |
+| Region | Supabase **Stockholm**. Vercel-backend **Stockholm (`arn1`)**. Privat innehåll får **inte** cachas publikt eller loggas. |
 
 Detta garanterar inte EU-lagring hos Claude.
 
@@ -108,7 +108,7 @@ Det är **instruktionstyrt** beteende, ingen garanti att Claude alltid anropar v
 
 Användarflöde: logga in på dashboarden → kopiera MCP-adressen → Claude fjärranslutning → logga in och godkänn → klistra in instruktionerna.
 
-Detalj: [docs/claude-koppling.md](docs/claude-koppling.md).
+Detalj: [docs/claude-koppling.md](docs/claude-koppling.md). Vercel-konto och GitHub-app: [docs/vercel-koppling.md](docs/vercel-koppling.md).
 
 ---
 

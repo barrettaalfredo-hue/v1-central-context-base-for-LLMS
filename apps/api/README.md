@@ -3,7 +3,8 @@
 **Person:** Alfredo  
 **Branch:** `alfredo/integrations`  
 **Stack:** Next.js **serverfunktioner** + **MCP SDK/adapter** på **Vercel**; **Supabase** PostgreSQL + Auth/OAuth  
-**Region:** Supabase **Stockholm**, Vercel-backend **Stockholm**  
+**Region:** Supabase **Stockholm**, Vercel-backend **Stockholm (`arn1`)**  
+**Vercel:** importera **hela** GitHub-repot (inte “bara en branch”). Första preview från `alfredo/integrations`. Steg: [docs/vercel-koppling.md](../../docs/vercel-koppling.md).  
 **Arbetar självständigt med:** förutbestämda minnessvar (exakt JSON från [docs/testexempel.md](../../docs/testexempel.md)) medan du bygger riktig Auth, databasåtkomst och MCP.
 
 Torsdag anropar du Melkers funktioner i `packages/memory/` i stället för förutbestämda svar. MCP-ytan ska då vara oförändrad.
