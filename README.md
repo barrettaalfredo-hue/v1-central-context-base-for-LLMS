@@ -6,6 +6,46 @@ Privat molnminne för **Claude Desktop**. Claude väljer vad som ska sparas och 
 
 TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Python, ingen separat AI-modell, ingen worker, ingen kö, ingen Cron, ingen vektordatabas.
 
+---
+
+## Läge 11 september 2026 — gren `alfredo/integrations`
+
+Det här är **Alfredos** gren, inte dashboarden. Filip bygger UI. Melker bygger minnesfunktionerna. Preview (Vercel Root Directory = `apps/api`): https://v1-central-context-base-for-llms-ky7122wyi.vercel.app
+
+### Vad som är gjort
+
+| Del | Status |
+| --- | --- |
+| Supabase i **Stockholm** (`eu-north-1`), projekt `uthkzkvpkkpzrmzjunqq` | Klart |
+| Tabell `memories` + RLS (eget konto ser bara egna rader, ingen DELETE) | Klart |
+| Publik signup av. Tre förskapade, confirmed konton | Klart |
+| Vercel-projekt kopplat till **det här** GitHub-repot, funktioner `arn1` | Klart |
+| Next.js-API i `apps/api`: login, session, logout, save/search/update | Klart och deployat |
+| Identiska dubbletter stoppas per konto. Fel svarar `{ "error": { "code", "message" } }` | Klart |
+
+Sidan på `/` är **Alfredos testsida** (logga in och spara en testdeadline). **Inte** Filips dashboard. Ta inte den som produkt-UI.
+
+### Vad som funkar hittills
+
+Filip kan anropa samma JSON som i [docs/contracts.md](docs/contracts.md):
+
+| Anrop | Funkar |
+| --- | --- |
+| `POST /api/auth/login` med `{ "email", "password" }` | Ja. Fel lösen → `INVALID_CREDENTIALS` |
+| `GET /api/auth/session` | Ja. Inloggad `{ data: { id, email } }` eller `{ data: null }` |
+| `POST /api/auth/logout` | Ja. `{ data: { success: true } }` |
+| `POST /api/memories` / `POST /api/mcp/save_memory` | Ja. Skriver i Stockholm-DB, sätter `id` + tider. Ägare = inloggning |
+| `GET /api/memories` / `POST /api/mcp/search_memory` | Ja. Filter + textsök, `updated_at` desc |
+| `PATCH /api/memories/:id` / `POST /api/mcp/update_memory` | Ja. 404 om saknas eller annat konto |
+
+Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md).
+
+### Vad som inte funkar än (Alfredos kvar)
+
+- Claude Desktop **fjärr-MCP** + OAuth (samma användare som dashboarden). HTTP-JSON ovan är inte Claude-protokollet.
+- Melkers paket `packages/memory` är inte inkopplat. API:t har en intern store mot Supabase tills Melker är klar.
+- Torsdagstesterna körs på `integration/v1`, inte här och inte på `main`.
+
 ```
 Claude Desktop  ↔  fjärr-MCP (Vercel)  ↔  minnesfunktioner (TypeScript)  ↔  Supabase
                                                       ↑
