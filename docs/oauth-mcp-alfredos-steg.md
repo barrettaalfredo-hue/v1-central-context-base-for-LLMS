@@ -6,8 +6,8 @@ Koden för MCP + OAuth finns på den här grenens PR. Det här kan inte agenten 
 
 1. `SUPABASE_SERVICE_ROLE_KEY` ska redan finnas (Secret, inte `NEXT_PUBLIC_`).
 2. **Använd inte** `https://v1-central-context-base-for-llms.vercel.app` — det är tom `main` och ger 404.  
-   MCP-URL är preview med hash, t.ex.  
-   `https://v1-central-context-base-for-llms-ntt7950tl.vercel.app/api/mcp`  
+   MCP-URL är den **preview** Claude ska anropa (hash eller git-alias), just nu:  
+   `https://v1-central-context-bas-git-838c5d-barrettaalfredo-hues-projects.vercel.app/api/mcp`  
    `NEXT_PUBLIC_APP_URL` behövs inte för OAuth-host (servern följer den host Claude anropar).
 3. **Deployment Protection:** Standard Protection / Vercel Login **av** på den URL Claude ska använda. Claude kan inte logga in på Vercel-SSO.  
    Settings → Deployment Protection → av för Production (och för den preview ni testar, eller Bypass for Automation räcker **inte** för Claude Desktop).
