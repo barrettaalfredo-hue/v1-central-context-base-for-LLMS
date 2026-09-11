@@ -1,7 +1,6 @@
 import { pkceChallenge } from "@/lib/oauth/crypto";
 import { consumeCode } from "@/lib/oauth/store";
-import { accessTokenExpiresIn } from "@/lib/oauth/tokens";
-import { createSupabaseAnonClient } from "@/lib/supabase/clients";
+import { issueMcpTokens, rotateMcpRefresh, type IssuedTokens } from "@/lib/oauth/sessions";
 
 export const dynamic = "force-dynamic";
 
@@ -10,13 +9,13 @@ const TOKEN_HEADERS = {
   "Access-Control-Allow-Origin": "*",
 };
 
-function tokenJson(accessToken: string, refreshToken: string | null) {
+function tokenJson(issued: IssuedTokens) {
   return Response.json(
     {
-      access_token: accessToken,
+      access_token: issued.access_token,
       token_type: "Bearer",
-      expires_in: accessTokenExpiresIn(accessToken),
-      refresh_token: refreshToken,
+      expires_in: issued.expires_in,
+      refresh_token: issued.refresh_token,
       scope: "memory",
     },
     { headers: TOKEN_HEADERS },
@@ -39,12 +38,11 @@ export async function POST(request: Request) {
     if (!refreshToken) {
       return Response.json({ error: "invalid_request" }, { status: 400, headers: TOKEN_HEADERS });
     }
-    const supabase = createSupabaseAnonClient();
-    const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
-    if (error || !data.session?.access_token) {
+    const issued = await rotateMcpRefresh(refreshToken);
+    if (!issued) {
       return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
     }
-    return tokenJson(data.session.access_token, data.session.refresh_token);
+    return tokenJson(issued);
   }
 
   if (grant !== "authorization_code") {
@@ -61,12 +59,18 @@ export async function POST(request: Request) {
     !row ||
     row.client_id !== clientId ||
     row.redirect_uri !== redirectUri ||
-    pkceChallenge(verifier) !== row.code_challenge
+    pkceChallenge(verifier) !== row.code_challenge ||
+    !row.refresh_token
   ) {
     return Response.json({ error: "invalid_grant" }, { status: 400, headers: TOKEN_HEADERS });
   }
 
-  return tokenJson(row.access_token, row.refresh_token);
+  const issued = await issueMcpTokens({
+    userId: row.user_id,
+    supabaseAccess: row.access_token,
+    supabaseRefresh: row.refresh_token,
+  });
+  return tokenJson(issued);
 }
 
 export function OPTIONS() {
