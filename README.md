@@ -8,46 +8,52 @@ TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Pyt
 
 ---
 
-## Läge 11 september 2026 — gren `alfredo/integrations`
+## Läge kväll 11 september 2026 — gren `alfredo/integrations`
 
-Det här är **Alfredos** gren, inte dashboarden. Filip bygger UI. Melker bygger minnesfunktionerna. Preview (Vercel Root Directory = `apps/api`): https://v1-central-context-base-for-llms-ky7122wyi.vercel.app
+Pausat för dagen. Det här är **Alfredos** gren, inte Filips dashboard. Melker bygger minnespaketet. Senaste preview efter merge av PR #7 (Root Directory `apps/api`): https://v1-central-context-base-for-llms-bb720p5c9.vercel.app
 
-### Vad som är gjort
+### SMS till teamet (kopiera)
 
-| Del | Status |
+Alfredo 11/9: login, DB i Stockholm och fjärr-MCP för Claude Desktop är inne på `alfredo/integrations`. Claude kopplade, sparade och sökte på riktigt. Production-URL:en är tom main (404) — använd preview. Kopplingen dog efter ~5 min, det är fixat (8 h token). Testsidan visar inte uppdateringar tillräckligt snabbt, det tar Alfredo imorgon. Kvar hos Alfredo: snabbare lista, A/B-test konto A vs B, inte mergea till main. Filip: fortsätt dashboard mot samma JSON, koppla mot API:t först torsdag på `integration/v1`. Melker: `packages/memory` är inte inkopplat än. Torsdag: Alfredo mergar först in i `integration/v1`, sen Melker, sen Filip. Tester där, inte på main.
+
+### Exakt vad som gjordes idag (11/9)
+
+| PR | Vad |
 | --- | --- |
-| Supabase i **Stockholm** (`eu-north-1`), projekt `uthkzkvpkkpzrmzjunqq` | Klart |
-| Tabell `memories` + RLS (eget konto ser bara egna rader, ingen DELETE) | Klart |
-| Publik signup av. Tre förskapade, confirmed konton | Klart |
-| Vercel-projekt kopplat till **det här** GitHub-repot, funktioner `arn1` | Klart |
-| Next.js-API i `apps/api`: login, session, logout, save/search/update | Klart och deployat |
-| Identiska dubbletter stoppas per konto. Fel svarar `{ "error": { "code", "message" } }` | Klart |
-| Fjärr-MCP-endpoint `/api/mcp` + OAuth (`/oauth/authorize`, `/oauth/token`) | Kod klar — Alfredo måste klicka i Vercel + Claude Desktop |
+| [#2](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/2) | Next.js i `apps/api`: login, session, logout, save/search/update mot Stockholm |
+| [#3](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/3) | Status i README så teamet ser vad som funkar |
+| [#4](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/4) | Fjärr-MCP `/api/mcp` + OAuth (`/oauth/authorize`, `/oauth/token`) |
+| [#5](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/5) | Claude Connect öppnade tom production (404). Servern följer nu preview-host. Publik anon-nyckel så login funkar utan `service_role` |
+| [#6](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/6) | Claude dog efter ~5 min. `refresh_token` + `expires_in` från JWT |
+| [#7](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/7) | 8 timmars MCP-token (Supabase-JWT stannar på servern). Testsida `/` med gult kort för senast uppdaterat minne |
 
-Sidan på `/` är **Alfredos testsida** (logga in och spara en testdeadline). **Inte** Filips dashboard. Ta inte den som produkt-UI.
+Claude Desktop **kopplade på riktigt**, anropade `save_memory` / `search_memory` / `update_memory`. Rader ligger i Stockholm. En ändring till **20 oktober** hann inte in innan kopplingen föll; senaste raden är fortfarande **22 oktober 2026**.
 
-### Vad som funkar hittills
+Använd **inte** `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404) och **inte** gamla preview `…-ko0vrc092` (~5 min token). MCP just nu: `https://v1-central-context-base-for-llms-bb720p5c9.vercel.app/api/mcp`. Klick: [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md).
 
-Filip kan anropa samma JSON som i [docs/contracts.md](docs/contracts.md):
+Sidan `/` är **Alfredos testsida**. Inte Filips dashboard.
+
+### Vad som funkar
 
 | Anrop | Funkar |
 | --- | --- |
 | `POST /api/auth/login` med `{ "email", "password" }` | Ja. Fel lösen → `INVALID_CREDENTIALS` |
 | `GET /api/auth/session` | Ja. Inloggad `{ data: { id, email } }` eller `{ data: null }` |
 | `POST /api/auth/logout` | Ja. `{ data: { success: true } }` |
-| `POST /api/memories` / `POST /api/mcp/save_memory` | Ja. Skriver i Stockholm-DB, sätter `id` + tider. Ägare = inloggning |
+| `POST /api/memories` / `POST /api/mcp/save_memory` | Ja. Skriver i Stockholm-DB. Ägare = inloggning |
 | `GET /api/memories` / `POST /api/mcp/search_memory` | Ja. Filter + textsök, `updated_at` desc |
 | `PATCH /api/memories/:id` / `POST /api/mcp/update_memory` | Ja. 404 om saknas eller annat konto |
+| Claude Desktop → `/api/mcp` (tre verktyg) + OAuth | Ja, mot preview. Inte mot production |
 
-Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md).
+Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-auth.md](docs/filip-auth.md).
 
-### Vad som inte funkar än (Alfredos klick + Melker)
+### Kvar — litet på Alfredos del
 
-- Claude Desktop är **inte inkopplad** förrän Alfredo följer [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md). Använd **inte** `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404). MCP-URL just nu: `https://v1-central-context-bas-git-838c5d-barrettaalfredo-hues-projects.vercel.app/api/mcp`. Stäng Vercel Login på den URL Claude anropar.
-- Melkers paket `packages/memory` är inte inkopplat. API:t har en intern store mot Supabase tills Melker är klar.
-- Torsdagstesterna körs på `integration/v1`, inte här och inte på `main`.
-
-Filip: hur vyerna kopplas den 17:e — [docs/filip-auth.md](docs/filip-auth.md).
+- **Imorgon:** testsidan/listan synkar för långsamt. Claude-spar syns inte tydligt. Snabbare uppdatering (pausat idag).
+- Kör A/B-scriptet `apps/api/scripts/ab-test.mjs` med lösen bara lokalt (Konto B får inte se Konto A).
+- Koppla om Claude mot **senaste** preview efter pausen och bekräfta 20 oktober på det gula kortet.
+- Inte mergea till `main`. Torsdag: den här grenen **först** in i `integration/v1`.
+- Melkers `packages/memory` byts in på torsdag. Intern store tills dess.
 
 ```
 Claude Desktop  ↔  fjärr-MCP (Vercel)  ↔  minnesfunktioner (TypeScript)  ↔  Supabase
