@@ -43,7 +43,7 @@ Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/
 
 ### Vad som inte funkar än (Alfredos klick + Melker)
 
-- Claude Desktop är **inte inkopplad** förrän Alfredo följer [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md) (stäng Vercel Login på preview, sätt `NEXT_PUBLIC_APP_URL`, lägg till connectorn).
+- Claude Desktop är **inte inkopplad** förrän Alfredo följer [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md). Använd **inte** `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404). MCP-URL är preview med hash, t.ex. `https://v1-central-context-base-for-llms-ntt7950tl.vercel.app/api/mcp`. Stäng Vercel Login på den URL Claude anropar.
 - Melkers paket `packages/memory` är inte inkopplat. API:t har en intern store mot Supabase tills Melker är klar.
 - Torsdagstesterna körs på `integration/v1`, inte här och inte på `main`.
 
