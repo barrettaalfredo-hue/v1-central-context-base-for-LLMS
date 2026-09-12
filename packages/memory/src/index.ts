@@ -12,3 +12,4 @@ export {
   type NormalizedMemoryInput,
 } from "./store";
 export { createInMemoryStore, contentFingerprint, type InMemoryStoreOptions } from "./in-memory";
+export { createSupabaseStore } from "./supabase";

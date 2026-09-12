@@ -69,6 +69,13 @@ export function createInMemoryStore(options: InMemoryStoreOptions = {}): MemoryS
     async update(userId, memoryId, fields) {
       const row = rows.find((candidate) => candidate.id === memoryId && candidate.user_id === userId);
       if (!row) return { kind: "missing" };
+      if (
+        rows.some(
+          (candidate) => candidate.id !== memoryId && sameIdentity(candidate, userId, fields),
+        )
+      ) {
+        return { kind: "failed", code: "UPDATE_FAILED", message: "Kunde inte uppdatera minnet." };
+      }
       row.project = fields.project;
       row.category = fields.category as MemoryRecord["category"];
       row.title = fields.title;
