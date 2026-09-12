@@ -98,7 +98,7 @@ Tills Melker är inkopplad: returnera förutbestämda svar som **bit för bit** 
 ## Klart på din gren när
 
 - [x] Tre konton finns; inloggnings-JSON stämmer
-- [x] RLS i DB: Konto B/C ser inte Konto A. HTTP `ab-test.mjs` kräver lösen i env
+- [x] A/B: Konto A sparar. Filip/Melker ser inte raden och kan inte uppdatera den
 - [x] MCP-verktygen finns som HTTP-JSON **och** `/api/mcp` (Claude-protokoll)
 - [x] Claude Desktop kopplade mot preview (OAuth + tre verktyg). Koppla om mot senaste preview
 - [x] Testsida: live + var 2:e sekund + vid fokus
