@@ -1,6 +1,6 @@
 # Gemensamma testexempel V1
 
-Alla tre använder **samma** rader. Filip visar dem i mock. Alfredo kan returnera dem som förutbestämda MCP-svar. Melker sparar/söker dem i simulerad lagring. Torsdag ska **samma innehåll** kunna skapas av Claude och synas i dashboarden.
+Alla tre använder **samma** rader. Filip visar dem i mock. Alfredo kan returnera dem som förutbestämda MCP-svar. Melker sparar/söker dem i simulerad lagring. Måndag ska **samma innehåll** kunna skapas av Claude och synas i dashboarden.
 
 Konto i exemplen: det förskapade kontot som teamet använder för testdagen (e-post låses av Alfredo när kontona skapas). Projektnamn: `Projekt A`.
 
