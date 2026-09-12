@@ -35,7 +35,17 @@ Inte `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404).
 | `PATCH /api/memories/:id` / Claude `update_memory` | Ja. 404 om saknas eller annat konto |
 | Claude Desktop → `/api/mcp` + OAuth | Ja, mot preview. Koppla en gång. Inte production |
 
-Konton ligger i lösenordshanteraren, inte i git. Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-auth.md](docs/filip-auth.md).
+### Testkonton (förskapade, ingen registrering)
+
+Samma tre konton till testsidan `/`, Claude OAuth och (senare) Filips dashboard.
+
+| Person | E-post | Lösenord |
+|---|---|---|
+| Filip | `filip.test@example.com` | `TestFilip#2026!` |
+| Alfredo | `alfredo.test@example.com` | `TestAlfredo#2026!` |
+| Melker | `melker.test@example.com` | `TestMelker#2026!` |
+
+Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-auth.md](docs/filip-auth.md).
 
 ### Inte klart här
 
