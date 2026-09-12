@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@v1/memory": ["../../packages/memory/src/index.ts"]
     }
   },
   "include": [
