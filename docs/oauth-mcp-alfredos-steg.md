@@ -7,7 +7,8 @@ Koden för MCP + OAuth finns på den här grenens PR. Det här kan inte agenten 
 1. `SUPABASE_SERVICE_ROLE_KEY` behövs **inte** längre för Claude-OAuth (koden sparas via inloggat konto).
 2. **Använd inte** `https://v1-central-context-base-for-llms.vercel.app` — det är tom `main` och ger 404.  
    **Använd inte** heller den gamla preview `…-ko0vrc092.vercel.app` — den ger Claude bara ~5 minuters token och kopplingen dör.  
-   MCP-URL: använd **senaste preview** från PR:n för den här fixen, inte `…-ko0vrc092` och inte `…-bb720p5c9` (de gamla dog efter tid).  
+   MCP-URL (PR #11, stängs inte av): `https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/api/mcp`  
+   Inte `…-ko0vrc092` och inte `…-bb720p5c9` (de gamla dog efter tid).  
    Koppla **en gång**. Servern stänger inte av connectorn. Supabase-JWT förnyas i bakgrunden.  
    `NEXT_PUBLIC_APP_URL` behövs inte för OAuth-host (servern följer den host Claude anropar).
 3. **Deployment Protection:** Standard Protection / Vercel Login **av** på den URL Claude ska använda. Claude kan inte logga in på Vercel-SSO.  
