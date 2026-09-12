@@ -47,12 +47,11 @@ Sidan `/` är **Alfredos testsida**. Inte Filips dashboard.
 
 Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-auth.md](docs/filip-auth.md).
 
-### Kvar 12/9 morgon
+### Alfredos del 12/9 — klar för paus
 
-- **Lista:** testsidan lyssnar live på `memories` + hämtar var 2:e sekund och vid fokus. Öppna **denna** PR-preview, inte gårdagens hash.
-- **A/B:** RLS i Stockholm stämmer (Alfredo ser 4 rader, Filip och Melker 0). HTTP-scriptet `apps/api/scripts/ab-test.mjs` körs lokalt med lösen i env — inte i git.
-- **Ditt klick:** koppla om Claude mot senaste preview och bekräfta 20 oktober på det gula kortet.
-- Inte mergea till `main`. Torsdag: den här grenen **först** in i `integration/v1`.
+- Claude sparar och testsidan visar det live (gult kort).
+- **A/B klart:** Konto A sparade en testrad. Filip och Melker såg 0 rader, även med känt `id`, och kunde inte ändra innehållet. Testdatan togs bort efteråt.
+- Inte mergea till `main`. Torsdag: den här grenen **först** in i `integration/v1`, sen Melker, sen Filip.
 - Melkers `packages/memory` byts in på torsdag.
 
 ```
