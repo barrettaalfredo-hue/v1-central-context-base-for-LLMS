@@ -2,7 +2,7 @@
 
 **Person:** Alfredo  
 **Branch:** `alfredo/integrations`  
-**Läge kväll 11/9:** login, minnen och Claude-MCP är inne. Pausat. Imorgon: snabbare lista. Teamstatus + SMS: [README.md](../../README.md#läge-kväll-11-september-2026--gren-alfredointegrations). Klick: [oauth-mcp-alfredos-steg.md](../../docs/oauth-mcp-alfredos-steg.md).  
+**Läge 12/9:** lista live + 2 s poll. RLS A/B i DB OK. Teamstatus: [README.md](../../README.md#läge-kväll-11-september-2026--gren-alfredointegrations). Klick: [oauth-mcp-alfredos-steg.md](../../docs/oauth-mcp-alfredos-steg.md).  
 **Stack:** Next.js **serverfunktioner** + **MCP SDK/adapter** på **Vercel**; **Supabase** PostgreSQL + Auth/OAuth  
 **Region:** Supabase **Stockholm (`eu-north-1`)**, Vercel-backend **Stockholm (`arn1`)**  
 **Supabase:** projekt `uthkzkvpkkpzrmzjunqq` är skapat. Konton, signup-lås och Vercel-env: [docs/supabase-setup.md](../../docs/supabase-setup.md).  
@@ -98,10 +98,10 @@ Tills Melker är inkopplad: returnera förutbestämda svar som **bit för bit** 
 ## Klart på din gren när
 
 - [x] Tre konton finns; inloggnings-JSON stämmer
-- [ ] RLS-test: Konto B ser inte Konto A — kör `apps/api/scripts/ab-test.mjs` (lösen i env)
+- [x] RLS i DB: Konto B/C ser inte Konto A. HTTP `ab-test.mjs` kräver lösen i env
 - [x] MCP-verktygen finns som HTTP-JSON **och** `/api/mcp` (Claude-protokoll)
-- [x] Claude Desktop kopplade mot preview idag (OAuth + tre verktyg). Koppla om mot senaste preview efter pausen
-- [ ] Testsida/lista synkar för långsamt — imorgon
+- [x] Claude Desktop kopplade mot preview (OAuth + tre verktyg). Koppla om mot senaste preview
+- [x] Testsida: live + var 2:e sekund + vid fokus
 - [x] Stockholm-region är satt; ingen publik cache av minnen
 - [x] Felvägar returnerar `error`, aldrig fejk-lycka
 

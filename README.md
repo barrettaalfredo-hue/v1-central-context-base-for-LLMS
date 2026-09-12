@@ -47,13 +47,13 @@ Sidan `/` är **Alfredos testsida**. Inte Filips dashboard.
 
 Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-auth.md](docs/filip-auth.md).
 
-### Kvar — litet på Alfredos del
+### Kvar 12/9 morgon
 
-- **Imorgon:** testsidan/listan synkar för långsamt. Claude-spar syns inte tydligt. Snabbare uppdatering (pausat idag).
-- Kör A/B-scriptet `apps/api/scripts/ab-test.mjs` med lösen bara lokalt (Konto B får inte se Konto A).
-- Koppla om Claude mot **senaste** preview efter pausen och bekräfta 20 oktober på det gula kortet.
+- **Lista:** testsidan lyssnar live på `memories` + hämtar var 2:e sekund och vid fokus. Öppna **denna** PR-preview, inte gårdagens hash.
+- **A/B:** RLS i Stockholm stämmer (Alfredo ser 4 rader, Filip och Melker 0). HTTP-scriptet `apps/api/scripts/ab-test.mjs` körs lokalt med lösen i env — inte i git.
+- **Ditt klick:** koppla om Claude mot senaste preview och bekräfta 20 oktober på det gula kortet.
 - Inte mergea till `main`. Torsdag: den här grenen **först** in i `integration/v1`.
-- Melkers `packages/memory` byts in på torsdag. Intern store tills dess.
+- Melkers `packages/memory` byts in på torsdag.
 
 ```
 Claude Desktop  ↔  fjärr-MCP (Vercel)  ↔  minnesfunktioner (TypeScript)  ↔  Supabase
