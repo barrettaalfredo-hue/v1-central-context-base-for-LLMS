@@ -5,7 +5,7 @@
 **Stack:** Next.js, React, TypeScript, Tailwind, deploy på **Vercel**  
 **Arbetar självständigt med:** simulerade API-svar, inloggning och exempelminnen från [docs/testexempel.md](../../docs/testexempel.md). Mocken ska följa [docs/contracts.md](../../docs/contracts.md) **exakt**.
 
-Torsdag byts mock mot Alfredos API + Melkers funktioner. Bygg inte om vyerna då — bara anslutningen.
+Måndag byts mock mot Alfredos API + Melkers funktioner. Bygg inte om vyerna då — bara anslutningen.
 
 ## Du måste leverera (annars är dashboarden inte klar)
 
@@ -69,4 +69,4 @@ De tre exempelminnena i [docs/testexempel.md](../../docs/testexempel.md) (Lanser
 - [ ] README i den här mappen förklarar `npm run dev` / Vercel
 - [ ] Ingen kod beror på att Alfredos eller Melkers tjänster körs
 
-Torsdag mergas den här grenen till **`integration/v1`** (efter Alfredo och Melker). Inte direkt till `main`.
+Måndag mergas den här grenen till **`integration/v1`** (efter Alfredo och Melker). Inte direkt till `main`.

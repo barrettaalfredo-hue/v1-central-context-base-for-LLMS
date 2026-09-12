@@ -18,7 +18,7 @@ Minst:
 - `updateMemory` — ändrar befintlig rad via `id` + `user_id`. Fel om fel ägare eller saknas. Ny `updated_at`.
 - `searchMemory` — `project?`, `category?`, `query?`, `offset?`. `query` i `title` och `content`. Sortering: `updated_at` fallande.
 
-Dashboard och MCP ska kunna importera **samma** modul. Inga duplicerade regler i Filips eller Alfredos kod efter torsdag.
+Dashboard och MCP ska kunna importera **samma** modul. Inga duplicerade regler i Filips eller Alfredos kod efter måndag.
 
 ### 2. Simulerad lagring + testdata
 
@@ -57,4 +57,4 @@ När minne ska uppdateras: **sök** → ta `id` → `updateMemory`. Du bygger st
 - [ ] Instruktionstexten är färdig och kopierbar
 - [ ] Exporten är en TypeScript-modul som Alfredo och Filip kan importera utan att skriva om regler
 
-Torsdag mergas den här grenen till **`integration/v1`** (efter Alfredo, före Filip). Inte direkt till `main`.
+Måndag mergas den här grenen till **`integration/v1`** (efter Alfredo, före Filip). Inte direkt till `main`.

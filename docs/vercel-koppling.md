@@ -1,6 +1,6 @@
 # Vercel-koppling
 
-Ett Vercel-projekt för **hela** GitHub-repot `barrettaalfredo-hue/v1-central-context-base-for-LLMS`. Inte “bara en branch för alltid”. Första preview ska komma från `alfredo/integrations`. `main` är inte live V1 förrän torsdagstesterna är godkända.
+Ett Vercel-projekt för **hela** GitHub-repot `barrettaalfredo-hue/v1-central-context-base-for-LLMS`. Inte “bara en branch för alltid”. Första preview ska komma från `alfredo/integrations`. `main` är inte live V1 förrän måndagstesterna är godkända.
 
 ## Redan gjort (agent, 11 sept 2026)
 

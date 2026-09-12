@@ -7,7 +7,7 @@
 **Vercel:** importera **hela** GitHub-repot (inte “bara en branch”). Första preview från `alfredo/integrations`. Steg: [docs/vercel-koppling.md](../../docs/vercel-koppling.md).  
 **Arbetar självständigt med:** förutbestämda minnessvar (exakt JSON från [docs/testexempel.md](../../docs/testexempel.md)) medan du bygger riktig Auth, databasåtkomst och MCP.
 
-Torsdag anropar du Melkers funktioner i `packages/memory/` i stället för förutbestämda svar. MCP-ytan ska då vara oförändrad.
+Måndag anropar du Melkers funktioner i `packages/memory/` i stället för förutbestämda svar. MCP-ytan ska då vara oförändrad.
 
 ## Du måste leverera (annars är backend/MCP inte klar)
 
@@ -24,7 +24,7 @@ Samma JSON som [docs/contracts.md](../../docs/contracts.md):
 - in: `{ email, password }`
 - ut inloggad / null / utloggning / `INVALID_CREDENTIALS`
 
-Session ska fungera från **olika datorer** (test 2 på torsdag).
+Session ska fungera från **olika datorer** (test 2 på måndag).
 
 ### 3. Databas
 
@@ -78,4 +78,4 @@ Tills Melker är inkopplad: returnera förutbestämda svar som **bit för bit** 
 - [ ] Stockholm-region är satt; ingen publik cache av minnen
 - [ ] Felvägar returnerar `error`, aldrig fejk-lycka
 
-Torsdag mergas den här grenen **först** in i **`integration/v1`**. Inte direkt till `main`.
+Måndag mergas den här grenen **först** in i **`integration/v1`**. Inte direkt till `main`.
