@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "tsx --test lib/oauth/crypto.test.ts lib/oauth/urls.test.ts lib/oauth/redirect.test.ts lib/oauth/tokens.test.ts lib/oauth/sessions.test.ts lib/supabase/env.test.ts"
