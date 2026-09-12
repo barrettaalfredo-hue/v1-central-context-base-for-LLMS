@@ -7,7 +7,7 @@ Enveckasplanen har redan låst det som tidigare var en tom workshop. **Koda inte
 | Sak | Värde |
 | --- | --- |
 | Produkt | Privat molnminne för Claude Desktop |
-| Integration | Torsdag 17 september 2026 på branchen `integration/v1`, därefter `main` |
+| Integration | Måndag 14 september 2026 på branchen `integration/v1`, därefter `main` |
 | Hosting | Vercel + Supabase, region Stockholm |
 | Språk | TypeScript överallt |
 | Claude-koppling | Fjärr-MCP på Vercel, inte lokal server |

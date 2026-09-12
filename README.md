@@ -2,7 +2,7 @@
 
 Privat molnminne för **Claude Desktop**. Claude väljer vad som ska sparas och hämtas enligt fasta instruktioner. Systemet lagrar och lämnar tillbaka minnen. Varje konto ser bara sitt eget minne.
 
-**V1-mål:** allt ihopkopplat och testat **torsdag 17 september 2026**.
+**V1-mål:** allt ihopkopplat och testat **måndag 14 september 2026**.
 
 TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Python, ingen separat AI-modell, ingen worker, ingen kö, ingen Cron, ingen vektordatabas.
 
@@ -10,7 +10,7 @@ TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Pyt
 
 ## Läge 12 september 2026 — gren `alfredo/integrations`
 
-Alfredos del på den här grenen är klar för V1. Det här är **inte** Filips dashboard. Melker byter in `packages/memory` på torsdag. Inte mergea till `main`.
+Alfredos del på den här grenen är klar för V1. Det här är **inte** Filips dashboard. Melker byter in `packages/memory` på måndag. Inte mergea till `main`.
 
 ### Preview — så här kollar du
 
@@ -64,11 +64,11 @@ Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-a
 
 - Filips Next.js-dashboard (`filip/dashboard`).
 - Melkers `packages/memory` är inte inkopplat än (Alfredo har en fungerande kopia i `apps/api/lib/memory/`).
-- Torsdag: den här grenen **först** in i `integration/v1`, sen Melker, sen Filip. Tester där, inte på `main`.
+- Måndag: den här grenen **först** in i `integration/v1`, sen Melker, sen Filip. Tester där, inte på `main`.
 
 ### SMS till teamet (kopiera)
 
-Alfredo 12/9: login, Stockholm-DB, fjärr-MCP och OAuth är klara på `alfredo/integrations`. Claude sparar/söker/uppdaterar. Testsida `/` visar det live. A/B: Filip och Melker ser inte Alfredos rader. MCP dör inte efter tid — koppla en gång mot preview-URL:en i README. Inte main (404). Filip: dashboard mot samma JSON, koppla API torsdag. Melker: byt in `packages/memory` torsdag. Torsdag: Alfredo först in i `integration/v1`.
+Alfredo 12/9: login, Stockholm-DB, fjärr-MCP och OAuth är klara på `alfredo/integrations`. Claude sparar/söker/uppdaterar. Testsida `/` visar det live. A/B: Filip och Melker ser inte Alfredos rader. MCP dör inte efter tid — koppla en gång mot preview-URL:en i README. Inte main (404). Filip: dashboard mot samma JSON, koppla API måndag. Melker: byt in `packages/memory` måndag. Måndag: Alfredo först in i `integration/v1`.
 
 ### PR:er som ligger inne
 
@@ -100,7 +100,7 @@ ChatGPT, automatisk chattinsamling, filer, delade arbetsytor, avancerad sorterin
 
 ---
 
-## Minimala features (måste finnas torsdag)
+## Minimala features (måste finnas måndag)
 
 1. Claude Desktop kopplar med **MCP** till databasen, med **tydliga instruktioner**.
 2. Minnesbasen kan **extrahera/spara information från chattar** (Claude anropar `save_memory` / `update_memory`).
@@ -125,14 +125,14 @@ Flöde vid uppdatering: Claude söker relevant minne, hämtar dess `id`, anropar
 
 ## Branches
 
-Alla person-grenar utgår från **samma startpaket**. Gemensamma format ändras bara efter överenskommelse. **Ingen feature-kod direkt till `main`.** Torsdag mergas de tre delarna till `integration/v1`, testas där, och går till `main` **först när testerna är godkända**.
+Alla person-grenar utgår från **samma startpaket**. Gemensamma format ändras bara efter överenskommelse. **Ingen feature-kod direkt till `main`.** Måndag mergas de tre delarna till `integration/v1`, testas där, och går till `main` **först när testerna är godkända**.
 
 | Branch | Person | När den används | Måste leverera |
 | --- | --- | --- | --- |
 | [`filip/dashboard`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/filip/dashboard) | Filip | Dagligen tills dashboarden är klar mot mock | [apps/dashboard/README.md](apps/dashboard/README.md) |
 | [`alfredo/integrations`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/alfredo/integrations) | Alfredo | Dagligen tills Auth, DB och fjärr-MCP är klara | [apps/api/README.md](apps/api/README.md) |
 | [`melker/memory`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/melker/memory) | Melker | Dagligen tills hjärnan + instruktioner är klara | [packages/memory/README.md](packages/memory/README.md) |
-| [`integration/v1`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/integration/v1) | Alla tre | **Torsdag 17/9 — ihopkoppling och test före `main`** | [docs/torsdag-test.md](docs/torsdag-test.md) + [docs/integration-v1.md](docs/integration-v1.md) |
+| [`integration/v1`](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/tree/integration/v1) | Alla tre | **Måndag 14/9 — ihopkoppling och test före `main`** | [docs/torsdag-test.md](docs/torsdag-test.md) + [docs/integration-v1.md](docs/integration-v1.md) |
 
 ```bash
 git fetch origin
@@ -190,7 +190,7 @@ Detalj: [docs/claude-koppling.md](docs/claude-koppling.md).
 
 ---
 
-## Torsdag 17/9 — testerna som måste klaras
+## Måndag 14/9 — testerna som måste klaras
 
 Körs på **`integration/v1`**, inte på `main`. Hur ni mergar: [docs/integration-v1.md](docs/integration-v1.md).
 

@@ -1,6 +1,6 @@
 # Filip: koppla dashboard-vyerna till Alfredos auth
 
-Gäller från **torsdag 17 september** när `alfredo/integrations` mergas in i `integration/v1`. Samma JSON som [contracts.md](contracts.md). Cookies måste följa med (`credentials: "include"`).
+Gäller från **måndag 14 september** när `alfredo/integrations` mergas in i `integration/v1`. Samma JSON som [contracts.md](contracts.md). Cookies måste följa med (`credentials: "include"`).
 
 Base URL: Vercel-preview för `alfredo/integrations` (Root Directory `apps/api`).
 
