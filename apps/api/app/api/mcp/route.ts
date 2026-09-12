@@ -1,22 +1,33 @@
 import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js";
+import { createMemoryApi, createSupabaseStore } from "@v1/memory";
 import { z } from "zod";
-import { saveMemory, searchMemory, updateMemory } from "@/lib/memory/store";
 import { getMcpSession, supabaseAccessForMcp } from "@/lib/oauth/sessions";
 import { createSupabaseUserClient } from "@/lib/supabase/clients";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-function jsonTool(result: { data: unknown } | { error: { code: string; message: string } }) {
-  if ("error" in result) {
+function jsonTool(result: { data?: unknown; error?: { code: string; message: string } }) {
+  if (result && "error" in result && result.error) {
     return {
       isError: true as const,
-      content: [{ type: "text" as const, text: JSON.stringify(result) }],
+      content: [{ type: "text" as const, text: JSON.stringify({ error: result.error }) }],
+    };
+  }
+  if (result && "data" in result && result.data !== undefined) {
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(result.data) }],
     };
   }
   return {
-    content: [{ type: "text" as const, text: JSON.stringify(result.data) }],
+    isError: true as const,
+    content: [
+      {
+        type: "text" as const,
+        text: JSON.stringify({ error: { code: "SAVE_FAILED", message: "Kunde inte spara minnet." } }),
+      },
+    ],
   };
 }
 
@@ -24,6 +35,16 @@ function userClient(extra: { authInfo?: AuthInfo }) {
   const token = extra.authInfo?.token;
   if (!token) throw new Error("UNAUTHENTICATED");
   return createSupabaseUserClient(token);
+}
+
+function mcpUserId(extra: { authInfo?: AuthInfo }) {
+  const id = extra.authInfo?.extra?.userId;
+  if (typeof id !== "string" || !id) throw new Error("UNAUTHENTICATED");
+  return id;
+}
+
+function memoryApi(extra: { authInfo?: AuthInfo }) {
+  return createMemoryApi(createSupabaseStore(userClient(extra)));
 }
 
 const handler = createMcpHandler(
@@ -37,7 +58,7 @@ const handler = createMcpHandler(
         title: z.string().min(1).max(150),
         content: z.string().min(1).max(10_000),
       },
-      async (input, extra) => jsonTool(await saveMemory(userClient(extra), input)),
+      async (input, extra) => jsonTool(await memoryApi(extra).saveMemory(mcpUserId(extra), input)),
     );
 
     server.tool(
@@ -49,7 +70,7 @@ const handler = createMcpHandler(
         query: z.string().optional(),
         offset: z.number().int().min(0).optional(),
       },
-      async (input, extra) => jsonTool(await searchMemory(userClient(extra), input)),
+      async (input, extra) => jsonTool(await memoryApi(extra).searchMemory(mcpUserId(extra), input)),
     );
 
     server.tool(
@@ -62,7 +83,7 @@ const handler = createMcpHandler(
         title: z.string().min(1).max(150),
         content: z.string().min(1).max(10_000),
       },
-      async (input, extra) => jsonTool(await updateMemory(userClient(extra), input)),
+      async (input, extra) => jsonTool(await memoryApi(extra).updateMemory(mcpUserId(extra), input)),
     );
   },
   { serverInfo: { name: "v1-memory", version: "0.1.0" } },

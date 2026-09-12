@@ -46,4 +46,4 @@ Inte möten. **Samma JSON** för ett minne.
 | Melker | Aldrig | Skapar/söker/uppdaterar samma objekt |
 | Filip | Aldrig (förutom anslutningsguide + OAuth-vy) | Visar samma objekt i listan |
 
-Alfredo kan först svara med **förutbestämda** minnen i exakt exempel-JSON. Melker kan köra mot **simulerad lagring** med samma JSON. Filip kan visa **exempelminnen** med samma JSON. Torsdag byts mock mot samma funktioner och samma databas.
+Alfredo kan först svara med **förutbestämda** minnen i exakt exempel-JSON. Melker kan köra mot **simulerad lagring** med samma JSON. Filip kan visa **exempelminnen** med samma JSON. Måndag byts mock mot samma funktioner och samma databas.

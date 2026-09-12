@@ -12,4 +12,4 @@
 
 Full status längst upp i [README.md](README.md). Leverans: [apps/api/README.md](apps/api/README.md). Setup: [docs/supabase-setup.md](docs/supabase-setup.md).
 
-**Inte `main`:** torsdag mergas den här grenen **först** in i **`integration/v1`**. Tester: [docs/torsdag-test.md](docs/torsdag-test.md).
+**Inte `main`:** måndag mergas den här grenen **först** in i **`integration/v1`**. Tester: [docs/torsdag-test.md](docs/torsdag-test.md).
