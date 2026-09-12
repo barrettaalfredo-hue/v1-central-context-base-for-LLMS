@@ -18,6 +18,9 @@ const repoRoot = findRepoRoot();
 const nextConfig: NextConfig = {
   transpilePackages: ["@v1/memory"],
   outputFileTracingRoot: repoRoot,
+  turbopack: {
+    root: repoRoot,
+  },
   poweredByHeader: false,
   async headers() {
     return [
