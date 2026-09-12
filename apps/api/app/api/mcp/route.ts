@@ -77,9 +77,14 @@ const verifyToken = async (
 
   const session = await getMcpSession(bearerToken);
   if (session) {
-    const supabaseAccess = await supabaseAccessForMcp(bearerToken, session);
-    const supabase = createSupabaseUserClient(supabaseAccess);
-    const { data, error } = await supabase.auth.getUser(supabaseAccess);
+    let supabaseAccess = await supabaseAccessForMcp(bearerToken, session);
+    let supabase = createSupabaseUserClient(supabaseAccess);
+    let { data, error } = await supabase.auth.getUser(supabaseAccess);
+    if (error || !data.user) {
+      supabaseAccess = await supabaseAccessForMcp(bearerToken, session, true);
+      supabase = createSupabaseUserClient(supabaseAccess);
+      ({ data, error } = await supabase.auth.getUser(supabaseAccess));
+    }
     if (error || !data.user) return undefined;
     return {
       token: supabaseAccess,

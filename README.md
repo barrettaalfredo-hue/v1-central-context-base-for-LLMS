@@ -51,6 +51,7 @@ Konton och lösenord ligger i lösenordshanteraren, inte i git. Env-namn: [docs/
 
 - Claude sparar och testsidan visar det live (gult kort).
 - **A/B klart:** Konto A sparade en testrad. Filip och Melker såg 0 rader, även med känt `id`, och kunde inte ändra innehållet. Testdatan togs bort efteråt.
+- **MCP stängs inte av:** access-tokenen tidsbegränsas inte längre. Refresh ger tillbaka **samma** tokens. Koppla en gång.
 - Inte mergea till `main`. Torsdag: den här grenen **först** in i `integration/v1`, sen Melker, sen Filip.
 - Melkers `packages/memory` byts in på torsdag.
 
