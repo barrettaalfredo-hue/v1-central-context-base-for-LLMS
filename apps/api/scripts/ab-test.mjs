@@ -18,6 +18,33 @@ if (!base || !aEmail || !aPassword || !bEmail || !bPassword) {
   process.exit(1);
 }
 
+function cookieHeader(response) {
+  const raw =
+    typeof response.headers.getSetCookie === "function"
+      ? response.headers.getSetCookie()
+      : [response.headers.get("set-cookie")].filter(Boolean);
+  const parts = raw.flatMap((value) =>
+    String(value)
+      .split(/,(?=\s*[^;]+=)/)
+      .map((cookie) => cookie.split(";")[0].trim())
+      .filter(Boolean),
+  );
+  return parts.join("; ");
+}
+
+function asRecord(body) {
+  if (body && typeof body === "object" && body.data && typeof body.data === "object") {
+    return body.data;
+  }
+  return body;
+}
+
+function asList(body) {
+  if (Array.isArray(body)) return body;
+  if (body && typeof body === "object" && Array.isArray(body.data)) return body.data;
+  return [];
+}
+
 async function login(email, password) {
   const response = await fetch(`${base}/api/auth/login`, {
     method: "POST",
@@ -25,11 +52,11 @@ async function login(email, password) {
     body: JSON.stringify({ email, password }),
   });
   const body = await response.json();
-  const cookie = response.headers.get("set-cookie");
+  const cookie = cookieHeader(response);
   if (!response.ok || !cookie) {
     throw new Error(`Login misslyckades för ${email}: ${JSON.stringify(body)}`);
   }
-  return cookie.split(",")[0];
+  return cookie;
 }
 
 async function json(cookie, path, init = {}) {
@@ -52,22 +79,23 @@ const saved = await json(cookieA, "/api/memories", {
   body: JSON.stringify({
     project: "Projekt A",
     category: "deadline",
-    title: "Lanseringsdatum",
+    title: `A/B-test ${Date.now()}`,
     content: `A/B-test ${Date.now()}`,
   }),
 });
-if (!saved.body.id) {
+const savedRow = asRecord(saved.body);
+if (!savedRow?.id) {
   console.error("Konto A kunde inte spara", saved);
   process.exit(1);
 }
 
-const listB = await json(cookieB, "/api/memories?project=Projekt%20A");
-if (Array.isArray(listB.body) && listB.body.some((row) => row.id === saved.body.id)) {
+const listB = await json(cookieB, "/api/memories");
+if (asList(listB.body).some((row) => row.id === savedRow.id)) {
   console.error("FAIL: Konto B såg Konto A:s minne");
   process.exit(1);
 }
 
-const updateB = await json(cookieB, `/api/memories/${saved.body.id}`, {
+const updateB = await json(cookieB, `/api/memories/${savedRow.id}`, {
   method: "PATCH",
   body: JSON.stringify({
     project: "Projekt A",
@@ -76,7 +104,8 @@ const updateB = await json(cookieB, `/api/memories/${saved.body.id}`, {
     content: "Konto B ska inte kunna detta",
   }),
 });
-if (updateB.status === 200 && updateB.body.id) {
+const updated = asRecord(updateB.body);
+if (updateB.status === 200 && updated?.id) {
   console.error("FAIL: Konto B uppdaterade Konto A:s minne");
   process.exit(1);
 }

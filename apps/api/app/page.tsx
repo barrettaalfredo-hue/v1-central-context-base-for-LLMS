@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type Session = { id: string; email: string } | null;
 type Memory = {
@@ -69,7 +70,9 @@ export default function TestPage() {
   const [fetchedAt, setFetchedAt] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [flashKey, setFlashKey] = useState("");
+  const [live, setLive] = useState(false);
   const previousLatest = useRef("");
+  const inflight = useRef(false);
 
   async function refreshSession() {
     const result = await api("/api/auth/session");
@@ -78,26 +81,32 @@ export default function TestPage() {
   }
 
   const loadMemories = useCallback(async () => {
-    const result = await api("/api/memories");
-    setFetchedAt(Date.now());
-    if (!result.ok) {
-      setLoadError(result.body?.error?.message ?? "Kunde inte hämta minnen.");
-      setMemories([]);
+    if (inflight.current) return;
+    inflight.current = true;
+    try {
+      const result = await api("/api/memories");
+      setFetchedAt(Date.now());
+      if (!result.ok) {
+        setLoadError(result.body?.error?.message ?? "Kunde inte hämta minnen.");
+        setMemories([]);
+        setOutput(JSON.stringify(result.body, null, 2));
+        return;
+      }
+      const list = sortByUpdated(asMemoryList(result.body));
+      setMemories(list);
+      setLoadError("");
       setOutput(JSON.stringify(result.body, null, 2));
-      return;
-    }
-    const list = sortByUpdated(asMemoryList(result.body));
-    setMemories(list);
-    setLoadError("");
-    setOutput(JSON.stringify(result.body, null, 2));
 
-    const latest = list[0];
-    if (!latest) return;
-    const key = `${latest.id}:${latest.updated_at}:${latest.content}`;
-    if (previousLatest.current && previousLatest.current !== key) {
-      setFlashKey(key);
+      const latest = list[0];
+      if (!latest) return;
+      const key = `${latest.id}:${latest.updated_at}:${latest.content}`;
+      if (previousLatest.current && previousLatest.current !== key) {
+        setFlashKey(key);
+      }
+      previousLatest.current = key;
+    } finally {
+      inflight.current = false;
     }
-    previousLatest.current = key;
   }, []);
 
   useEffect(() => {
@@ -109,10 +118,48 @@ export default function TestPage() {
 
   useEffect(() => {
     if (!session) return;
-    const timer = window.setInterval(() => {
+    const poll = window.setInterval(() => {
       void loadMemories();
-    }, 5_000);
-    return () => window.clearInterval(timer);
+    }, 2_000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void loadMemories();
+    };
+    window.addEventListener("focus", onVisible);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.clearInterval(poll);
+      window.removeEventListener("focus", onVisible);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [session, loadMemories]);
+
+  useEffect(() => {
+    if (!session) {
+      setLive(false);
+      return;
+    }
+    const supabase = createSupabaseBrowserClient();
+    const channel = supabase
+      .channel(`memories-${session.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "memories",
+          filter: `user_id=eq.${session.id}`,
+        },
+        () => {
+          void loadMemories();
+        },
+      )
+      .subscribe((status) => {
+        setLive(status === "SUBSCRIBED");
+      });
+    return () => {
+      setLive(false);
+      void supabase.removeChannel(channel);
+    };
   }, [session, loadMemories]);
 
   useEffect(() => {
@@ -153,8 +200,8 @@ export default function TestPage() {
         <h1 className="text-2xl font-semibold">Alfredo — API-test</h1>
         <p className="text-sm text-neutral-500">
           Inte Filips dashboard. Logga in med <strong>samma konto som Claude</strong>.
-          Listan hämtas var 5:e sekund. Det senast ändrade minnet ligger överst i det
-          gula kortet.
+          Listan hoppar fram direkt när Claude sparar, plus varannan sekund. Det senast
+          ändrade minnet ligger överst i det gula kortet.
         </p>
       </div>
 
@@ -202,7 +249,8 @@ export default function TestPage() {
 
       {session && fetchedAt ? (
         <p className="text-xs text-neutral-500">
-          {memories.length} minnen · hämtat {formatRelative(new Date(fetchedAt).toISOString(), now)}
+          {live ? "Live" : "Hämtar"} · {memories.length} minnen · hämtat{" "}
+          {formatRelative(new Date(fetchedAt).toISOString(), now)}
         </p>
       ) : null}
 
