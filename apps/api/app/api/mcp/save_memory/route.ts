@@ -1,5 +1,5 @@
+import { createMemoryApi, createSupabaseStore } from "@v1/memory";
 import { jsonError, jsonOk } from "@/lib/http";
-import { saveMemory } from "@/lib/memory/store";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,8 @@ export async function POST(request: Request) {
     return jsonError("INVALID_BODY", "Ogiltig JSON.", 400);
   }
 
-  const result = await saveMemory(supabase, {
+  const api = createMemoryApi(createSupabaseStore(supabase));
+  const result = await api.saveMemory(data.user.id, {
     project: String(body.project ?? ""),
     category: String(body.category ?? ""),
     title: String(body.title ?? ""),

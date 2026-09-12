@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@v1/memory"],
   poweredByHeader: false,
   async headers() {
     return [

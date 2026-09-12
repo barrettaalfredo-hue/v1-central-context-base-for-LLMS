@@ -1,5 +1,5 @@
+import { createMemoryApi, createSupabaseStore } from "@v1/memory";
 import { jsonError, jsonOk } from "@/lib/http";
-import { saveMemory, searchMemory } from "@/lib/memory/store";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ async function requireUser() {
   if (error || !data.user) {
     return { error: jsonError("UNAUTHENTICATED", "Inte inloggad.", 401) };
   }
-  return { supabase };
+  return { supabase, userId: data.user.id };
 }
 
 export async function GET(request: Request) {
@@ -19,7 +19,8 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const offsetRaw = url.searchParams.get("offset");
-  const result = await searchMemory(auth.supabase, {
+  const api = createMemoryApi(createSupabaseStore(auth.supabase));
+  const result = await api.searchMemory(auth.userId, {
     project: url.searchParams.get("project") ?? undefined,
     category: url.searchParams.get("category") ?? undefined,
     query: url.searchParams.get("query") ?? undefined,
@@ -43,7 +44,8 @@ export async function POST(request: Request) {
     return jsonError("INVALID_BODY", "Ogiltig JSON.", 400);
   }
 
-  const result = await saveMemory(auth.supabase, {
+  const api = createMemoryApi(createSupabaseStore(auth.supabase));
+  const result = await api.saveMemory(auth.userId, {
     project: String(body.project ?? ""),
     category: String(body.category ?? ""),
     title: String(body.title ?? ""),

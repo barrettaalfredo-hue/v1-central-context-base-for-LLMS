@@ -10,7 +10,7 @@ TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Pyt
 
 ## Läge 12 september 2026 — gren `alfredo/integrations`
 
-Alfredos del på den här grenen är klar för V1. Det här är **inte** Filips dashboard. Melker byter in `packages/memory` på måndag. Inte mergea till `main`.
+Alfredos del på den här grenen är klar för V1. Det här är **inte** Filips dashboard. API:t anropar Melkers `@v1/memory`. Inte mergea till `main`.
 
 ### Preview — så här kollar du
 
@@ -35,6 +35,7 @@ Klick i detalj: [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.m
 - Fjärr-MCP + OAuth. Claude Desktop har sparat, sökt och uppdaterat på riktigt.
 - Testsida `/` visar nya och ändrade minnen live (gult kort).
 - MCP stängs inte av efter tid. Refresh ger tillbaka samma tokens. Koppla en gång.
+- Melkers `@v1/memory` är inkopplat. En hjärna. `apps/api/lib/memory/` är borttagen.
 
 ### Vad som funkar
 
@@ -63,12 +64,11 @@ Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-a
 ### Inte klart här
 
 - Filips Next.js-dashboard (`filip/dashboard`).
-- Melkers `packages/memory` är inte inkopplat än (Alfredo har en fungerande kopia i `apps/api/lib/memory/`).
 - Måndag: den här grenen **först** in i `integration/v1`, sen Melker, sen Filip. Tester där, inte på `main`.
 
 ### SMS till teamet (kopiera)
 
-Alfredo 12/9: login, Stockholm-DB, fjärr-MCP och OAuth är klara på `alfredo/integrations`. Claude sparar/söker/uppdaterar. Testsida `/` visar det live. A/B: Filip och Melker ser inte Alfredos rader. MCP dör inte efter tid — koppla en gång mot preview-URL:en i README. Inte main (404). Filip: dashboard mot samma JSON, koppla API måndag. Melker: byt in `packages/memory` måndag. Måndag: Alfredo först in i `integration/v1`.
+Alfredo 12/9: login, Stockholm-DB, fjärr-MCP och OAuth är klara på `alfredo/integrations`. Claude sparar/söker/uppdaterar. Testsida `/` visar det live. A/B: Filip och Melker ser inte Alfredos rader. MCP dör inte efter tid — koppla en gång mot preview-URL:en i README. Inte main (404). Filip: dashboard mot samma JSON, koppla API måndag. Melkers `@v1/memory` är inkopplat i API:t. Måndag: Alfredo först in i `integration/v1`.
 
 ### PR:er som ligger inne
 

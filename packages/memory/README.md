@@ -2,59 +2,88 @@
 
 **Person:** Melker  
 **Branch:** `melker/memory`  
+**Paket:** `@v1/memory`  
 **Stack:** Vanliga **TypeScript-funktioner** (ingen Python, ingen worker, ingen kö, ingen Cron, ingen vektordb)  
 **Arbetar självständigt med:** testdata och **simulerad lagring**; bygger regler, sökning och Claude-instruktioner.
 
-Efter integration anropas **samma funktioner** av dashboardens serverkod och av MCP. Då pekar lagringen på Supabase via det Alfredo exponerar — inte en andra söklogik.
+Efter integration anropas **samma funktioner** av dashboardens serverkod och av MCP. Alfredo byter anrop. Filip anropar HTTP, inte den här modulen direkt.
 
-## Du måste leverera (annars är hjärnan inte klar)
+## Export
 
-### 1. Funktioner (samma in/ut som [docs/contracts.md](../../docs/contracts.md))
+Importera från `@v1/memory`:
 
-Minst:
+- `validateMemoryInput`, `validateSearchInput`, `validateMemoryId`
+- `saveMemory`, `searchMemory`, `updateMemory`
+- `createMemoryApi`, `createInMemoryStore`, `createSupabaseStore`, `toIso`
 
-- `validateMemoryInput` — `project` 1–100, `category` en av fem, `title` 1–150, `content` 1–10 000. Annars felkod, inget sparande.
-- `saveMemory` — skapar minne för given `user_id`. Backend-fält `id` (UUID), `created_at`, `updated_at`.
-- `updateMemory` — ändrar befintlig rad via `id` + `user_id`. Fel om fel ägare eller saknas. Ny `updated_at`.
-- `searchMemory` — `project?`, `category?`, `query?`, `offset?`. `query` i `title` och `content`. Sortering: `updated_at` fallande.
+`Result<T>` är `{ data: T } | { error: { code, message } }`. Inte ett naket minne. `user_id` är första argumentet, aldrig ett fält i svaret.
 
-Dashboard och MCP ska kunna importera **samma** modul. Inga duplicerade regler i Filips eller Alfredos kod efter måndag.
+```ts
+import { createMemoryApi, createSupabaseStore } from "@v1/memory";
 
-### 2. Simulerad lagring + testdata
+const api = createMemoryApi(createSupabaseStore(supabase));
+await api.saveMemory(userId, input);
+```
 
-- In-memory eller fil, spelar ingen roll — men form och regler identiska med kontraktet.
-- Ladda [docs/testexempel.md](../../docs/testexempel.md) som fixtures.
-- Tester som **måste grönt** på din gren:
-  - spara Lanseringsdatum → sök `"oktober"` träffar
-  - filter `category=deadline` och `project=Projekt A`
-  - uppdatera content till 22 oktober, samma `id`
-  - ogiltig category → error, 0 rader
-  - två user_id: A:s minne syns inte i B:s sök
-  - identisk om-sparning: dokumentera och implementera den regel ni behöver för **inga identiska dubbletter** (sök-före-spar som Claude ska göra; funktion som kan hitta befintlig rad med samma user+project+category+title+content så MCP/instruktioner kan uppdatera `id` i stället)
+`userId` skall vara samma värde som `auth.uid()` i JWT:n som klienten bär. Supabase-adaptern skickar inte `user_id` i insert. Triggern `private.set_memory_defaults` sätter den. In-memory filtrerar `user_id` själv.
 
-### 3. Claude-instruktioner
+## Adapter mot `apps/api` (Alfredos beslut)
 
-- Äg [docs/claude-instruktioner.md](../../docs/claude-instruktioner.md).
-- Texten ska stämma med `save_memory` / `search_memory` / `update_memory`.
-- Förklara i paketets README hur instruktionen mappar till funktionerna (sök före spar, uppdatera vid tydlig ändring, bekräfta bara efter lyckat svar).
+Ingen rot-`package.json` och inga workspaces. Root Directory förblir `apps/api`.
 
-### 4. Uppdateringsflöde (produktregel)
+1. I `apps/api/package.json`: `"@v1/memory": "file:../../packages/memory"`
+2. I `apps/api/next.config.ts`: `transpilePackages: ["@v1/memory"]`
+3. Anropsställen som idag importerar `@/lib/memory/store`:
+   - `apps/api/app/api/mcp/route.ts`
+   - `apps/api/app/api/mcp/save_memory/route.ts`
+   - `apps/api/app/api/mcp/search_memory/route.ts`
+   - `apps/api/app/api/mcp/update_memory/route.ts`
+   - `apps/api/app/api/memories/route.ts`
+   - `apps/api/app/api/memories/[id]/route.ts`
+4. Därefter radera `apps/api/lib/memory/` så det bara finns en hjärna.
 
-När minne ska uppdateras: **sök** → ta `id` → `updateMemory`. Du bygger stöd för det. Du bygger **inte** versionshistorik eller automatisk merge vid motstridiga texter.
+Merga inte PR #13. Den har fel Result-form och fel query-städning.
 
-## Du ska inte bygga
+## Regler som paketet äger
 
-- FastAPI, Python-worker, Scaleway, Redis-kö, embeddings, konfliktsmotor, arkiv/glömma.
-- Next.js-sidor, MCP-server, OAuth, Supabase-projekt (Alfredo).
-- ChatGPT.
-- Extra fält (`topic`, `source`, `version`, `status`) — de är borttagna ur V1.
+- Validate trimmar före längd och category. Ett fel i ordning project → title → content → category.
+- Identisk omsparning (samma konto, project, category, title, `md5(content)`) är lycka: samma `id`, samma `updated_at`. Inte ett fel.
+- Sök städar `query` med `replace(/[%_,()]/g, " ").trim()`. Tom efter städ = inget textfilter.
+- `query` är skiftlägesokänslig substring i `title` och `content`. `project` och `category` är exakta och skiftlägeskänsliga.
+- Sortering `updated_at` fallande. `offset` hoppar rader. Sidstorlek 50.
+- Tider ut: `YYYY-MM-DDTHH:MM:SSZ` (millisekunder bort). Update låser `id` och `created_at`, sätter alltid ny `updated_at`.
+- Saknad rad och annan ägare ger samma `NOT_FOUND`: `Minnet finns inte eller tillhör ett annat konto.`
+- IO-fel behåller Alfredos koder `SAVE_FAILED`, `SEARCH_FAILED`, `UPDATE_FAILED`.
+
+## Hur Claude-instruktioner mappar
+
+Texten i [docs/claude-instruktioner.md](../../docs/claude-instruktioner.md) är den kopierbara projekttexten. Den strider inte mot identisk-omsparning-som-lycka.
+
+| Instruktion | Funktion / verktyg |
+| --- | --- |
+| Hämta relevant projektminne före projektfrågor | `searchMemory` / `search_memory` |
+| Spara bekräftade fakta, beslut, mål, deadlines, preferenser | `saveMemory` / `save_memory` med rätt `category` |
+| Sök före sparning | Claude anropar `search_memory` först. Identisk `saveMemory` är ändå lycka och skapar inte en andra rad. |
+| Uppdatera befintligt ID vid tydlig ändring | `updateMemory` / `update_memory` |
+| Bekräfta sparning först efter lyckat verktygssvar | Visa inte “sparat” om svaret har `error` |
+
+Uppdateringsflöde: sök → ta `id` → `updateMemory`. Ingen versionshistorik.
+
+## Tester
+
+```bash
+cd packages/memory
+npx tsx --test test/**/*.test.ts
+```
+
+Fixtures kommer från [docs/testexempel.md](../../docs/testexempel.md). Paritet kör samma vektor mot `createInMemoryStore` och en fake-Supabase-klient (trigger, RLS, `23505`). Inga live-writes.
 
 ## Klart på din gren när
 
-- [ ] Funktionerna validerar, sparar, uppdaterar, söker enligt kontraktet mot simulerad lagring
-- [ ] Alla testexempel i `docs/testexempel.md` har automatiska tester som går grönt
-- [ ] Isolering mellan två `user_id` är testad
-- [ ] Instruktionstexten är färdig och kopierbar
-- [ ] Exporten är en TypeScript-modul som Alfredo och Filip kan importera utan att skriva om regler
+- [x] Funktionerna validerar, sparar, uppdaterar, söker enligt kontraktet mot simulerad lagring
+- [x] Alla testexempel i `docs/testexempel.md` har automatiska tester som går grönt
+- [x] Isolering mellan två `user_id` är testad
+- [x] Instruktionstexten är färdig och kopierbar
+- [x] Exporten är en TypeScript-modul som Alfredo och Filip kan importera utan att skriva om regler
 
 Måndag mergas den här grenen till **`integration/v1`** (efter Alfredo, före Filip). Inte direkt till `main`.
