@@ -4,9 +4,11 @@ Alla tre bygger mot den här filen. Formatet är JSON för informationen och Typ
 
 Status: **LÅST** enligt 1-veckasplanen.
 
+Uppdaterad 12 september 2026 med alla tres godkännande: dubblettregel, sidstorlek, sökregler, felkoder, exportnamn och exakt tidsstämpelformat är nu dokumenterade. Inga fält har lagts till, tagits bort eller ändrats. Tilläggen beskriver beteende som redan körs i `apps/api/lib/memory/`.
+
 ## Minne (det som dashboard, MCP och hjärnan delar)
 
-Databasen lagrar dessutom `user_id`. `user_id` skickas **inte** i dashboard- eller MCP-svar till klienten som ett fält Claude får hitta på. Ägare = inloggning.
+Databasen lagrar dessutom `user_id`. `user_id` returneras aldrig i svar till klienten. Ägare = inloggning.
 
 | Fält | Format och regel | Vem fyller i |
 | --- | --- | --- |
@@ -15,7 +17,7 @@ Databasen lagrar dessutom `user_id`. `user_id` skickas **inte** i dashboard- ell
 | `category` | Endast `fact`, `decision`, `goal`, `deadline` eller `preference` | Claude |
 | `title` | Text, 1–150 tecken | Claude |
 | `content` | Text, 1–10 000 tecken | Claude |
-| `created_at` | UTC, t.ex. `2026-09-10T12:00:00Z` | Backend |
+| `created_at` | UTC, exakt `YYYY-MM-DDTHH:MM:SSZ`. Millisekunder utelämnas | Backend |
 | `updated_at` | Samma datumformat | Backend |
 
 Kategorietiketter i dashboarden (svenska):
@@ -44,6 +46,10 @@ Kategorietiketter i dashboarden (svenska):
 
 Ogiltig `category`, tom `title`, `project` över 100 tecken eller `content` över 10 000 tecken = fel, inget minne sparat.
 
+Fälten trimmas före kontroll, och det trimmade värdet är det som sparas. En `title` med bara blanksteg räknas därför som tom.
+
+Felkoder som får förekomma: `INVALID_PROJECT`, `INVALID_TITLE`, `INVALID_CONTENT`, `INVALID_CATEGORY`, `INVALID_ID`, `INVALID_OFFSET`, `NOT_FOUND`, `INVALID_CREDENTIALS`. Vid flera ogiltiga fält returneras ett enda fel, i ordningen `project`, `title`, `content`, `category`.
+
 ## Inloggning
 
 Tre förskapade konton (e-post + lösenord). Ingen registreringsvy i V1.
@@ -68,17 +74,27 @@ In: `{ "project": string, "category": string, "title": string, "content": string
 Ut vid lycka: ett minnesobjekt som ovan.  
 Ut vid fel: `{ "error": { "code": string, "message": string } }` — får **aldrig** se ut som lyckad sparning.
 
+Identisk omsparning, alltså samma konto plus samma `project`, `category`, `title` och `content`, skapar ingen ny rad. Den returnerar befintlig rad som **lyckat** svar, med oförändrat `id` och oförändrat `updated_at`. Det är inte ett fel.
+
 ### `search_memory`
 
 In: `{ "project"?: string, "category"?: string, "query"?: string, "offset"?: number }`  
 Ut: lista av minnesobjekt, `updated_at` fallande. Tom lista är giltig, inte fel.  
 `query` söker i `title` och `content`.
 
+Högst **50** minnen per anrop. `offset` hoppar över rader i samma sortering, så nästa sida hämtas med `offset: 50`. `offset` måste vara ett heltal 0 eller högre.
+
+`query` matchar delsträng och är skiftlägesokänsligt. Tecknen `%`, `_`, `,`, `(` och `)` tas bort ur `query` före sökning, och blir `query` tom efter det används inget textfilter alls. `project` och `category` matchar exakt och är skiftlägeskänsliga.
+
 ### `update_memory`
 
 In: `{ "id": string, "project": string, "category": string, "title": string, "content": string }`  
 Ut vid lycka: uppdaterat minnesobjekt (`updated_at` nytt, `id` samma).  
 Ut vid fel (finns inte, tillhör annan användare, ogiltiga fält): error-objekt, aldrig ett “lyckat” minne.
+
+`id` måste vara ett UUID. Alla fält krävs, partiell uppdatering finns inte. `updated_at` sätts alltid om, även när inget fält faktiskt ändrats, och raden hamnar då först i sökresultatet.
+
+Om raden inte finns, och om den tillhör ett annat konto, returneras **samma** fel med samma kod och samma text. Felet får inte avslöja om ett `id` existerar.
 
 ## Hjärnans funktioner (Melker) — samma kontrakt
 
@@ -89,8 +105,14 @@ TypeScript-funktioner som både dashboard-API och MCP anropar efter ihopkoppling
 - uppdatera via `id`
 - söka (`query`, `project`, `category`, `offset`) med senast uppdaterat först
 
-Simulerad lagring hos Melker och riktig Supabase hos Alfredo ska ge **samma form** på in och ut.
+Exporterade namn: `validateMemoryInput`, `validateSearchInput`, `validateMemoryId`, `saveMemory`, `searchMemory`, `updateMemory`. Det är `searchMemory` i singular, inte `searchMemories`.
+
+De tre huvudfunktionerna tar `user_id` som första argument, hämtat ur anroparens session. Modulen tar aldrig emot `user_id` från verktygsindata och kontrollerar det aldrig mot Claudes inskickade värden, eftersom sådana inte finns.
+
+Simulerad lagring hos Melker och riktig Supabase hos Alfredo ska ge **samma form** på in och ut, och **samma beteende** för sökstädning, skiftläge, tidsstämpelformat, sidstorlek och dubbletter.
 
 ## Säkerhet
 
 Konto A får aldrig läsa eller uppdatera Konto B:s minnen, även om minnes-`id` är känt. Tester måste visa det.
+
+Lösenord, nycklar och tokens hör inte i git, inte i Confluence och inte i PR-beskrivningar. Hamnar de där räcker det inte att ta bort dem, kontona måste bytas.
