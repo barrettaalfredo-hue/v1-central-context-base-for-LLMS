@@ -6,4 +6,4 @@ Du äger **`packages/memory/`** (TypeScript-hjärnan). Exakt vad som ska vara kl
 
 Samma funktioner ska användas av både dashboard och MCP efter ihopkoppling. Ingen Python, worker, kö eller vektordb.
 
-**Inte `main`:** torsdag mergas den här grenen till **`integration/v1`** (efter Alfredo, före Filip). Tester: [docs/torsdag-test.md](docs/torsdag-test.md).
+**Inte `main`:** måndag mergas den här grenen till **`integration/v1`** (efter Alfredo, före Filip). Tester: [docs/torsdag-test.md](docs/torsdag-test.md).

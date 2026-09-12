@@ -1,7 +1,7 @@
 # `integration/v1` — ihopkoppling och test före `main`
 
 **Ägare:** Filip, Alfredo och Melker tillsammans.  
-**Inte** för daglig feature-kod. Hit mergas de tre person-grenarna **torsdag 17 september 2026**. Här körs [torsdag-test.md](torsdag-test.md). **`main` rörs inte** förrän de fyra testerna är godkända.
+**Inte** för daglig feature-kod. Hit mergas de tre person-grenarna **måndag 14 september 2026**. Här körs [torsdag-test.md](torsdag-test.md). **`main` rörs inte** förrän de fyra testerna är godkända.
 
 ## Vad den här branchen ska innehålla efter merge
 
@@ -47,7 +47,7 @@ Dessutom:
 
 - Halvfärdiga experiment från en person
 - Ny feature som bara en äger (lägg den på person-grenen först)
-- Direkt-merge till `main` “för att det är torsdag” utan att testerna är gröna
+- Direkt-merge till `main` “för att det är måndag” utan att testerna är gröna
 
 ## Efter godkända tester
 

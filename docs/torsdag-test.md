@@ -1,4 +1,4 @@
-# Torsdag 17 september 2026 — integration och test
+# Måndag 14 september 2026 — integration och test
 
 Tester körs på branchen **`integration/v1`**, inte på `main`.  
 Merga `filip/dashboard`, `alfredo/integrations` och `melker/memory` dit (ordning: Alfredo → Melker → Filip). En vecka är målet; den riskabla delen är MCP/OAuth. Hur ni mergar: [integration-v1.md](integration-v1.md).
