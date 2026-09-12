@@ -12,8 +12,21 @@ TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Pyt
 
 Alfredos del på den här grenen är klar för V1. Det här är **inte** Filips dashboard. Melker byter in `packages/memory` på torsdag. Inte mergea till `main`.
 
-**MCP (koppla en gång):** `https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/api/mcp`  
-Inte `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404). Inte `…-ko0vrc092` eller `…-bb720p5c9`. Klick: [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md). Sidan `/` är Alfredos testsida.
+### Preview — så här kollar du
+
+Inte `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404). Inte `…-ko0vrc092` eller `…-bb720p5c9`.
+
+| Vad | Länk |
+| --- | --- |
+| **Vercel testsida** (Alfredos lista, inte Filips dashboard) | https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/ |
+| **MCP till Claude** (koppla en gång, lämna den) | `https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/api/mcp` |
+| Vercel-projekt (deployments) | https://vercel.com/barrettaalfredo-hues-projects/v1-central-context-base-for-llms |
+
+1. Öppna **testsidan**. Logga in med `alfredo.test@example.com` (tabellen nedan). Du ska se dina minnen och det gula kortet.
+2. Claude Desktop → Connectors → klistra in **MCP-länken**. Godkänn med samma konto. Byt inte URL sen.
+3. Skriv t.ex. “Vi lanserar 15 oktober i Projekt A”. Rad ska synas på testsidan utan reload.
+
+Klick i detalj: [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md).
 
 ### Klart
 
