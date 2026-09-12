@@ -8,7 +8,7 @@
 **Supabase:** projekt `uthkzkvpkkpzrmzjunqq` är skapat. Konton, signup-lås och Vercel-env: [docs/supabase-setup.md](../../docs/supabase-setup.md).  
 **Arbetar självständigt med:** förutbestämda minnessvar (exakt JSON från [docs/testexempel.md](../../docs/testexempel.md)) medan du bygger riktig Auth, databasåtkomst och MCP.
 
-API:t anropar Melkers `@v1/memory` (`file:../../packages/memory`). Ingen kopia i `lib/memory/`. MCP-ytan är oförändrad.
+API:t anropar Melkers `@v1/memory`. Vercel Root Directory är `apps/api`, så paketet ligger i `vendor/memory` (`file:./vendor/memory`). Källan är fortfarande `packages/memory`. Ingen kopia i `lib/memory/`. MCP-ytan är oförändrad.
 
 ## Hur du kör (den här mappen)
 
@@ -104,6 +104,6 @@ Tills Melker är inkopplad: returnera förutbestämda svar som **bit för bit** 
 - [x] Testsida: live + var 2:e sekund + vid fokus
 - [x] Stockholm-region är satt; ingen publik cache av minnen
 - [x] Felvägar returnerar `error`, aldrig fejk-lycka
-- [x] `@v1/memory` via `file:../../packages/memory` + `transpilePackages`
+- [x] `@v1/memory` via `file:./vendor/memory` + `transpilePackages` (källa `packages/memory`)
 
 Måndag mergas den här grenen **först** in i **`integration/v1`**. Inte direkt till `main`.

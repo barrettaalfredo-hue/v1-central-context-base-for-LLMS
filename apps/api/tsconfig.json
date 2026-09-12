@@ -20,7 +20,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@v1/memory": ["../../packages/memory/src/index.ts"]
+      "@v1/memory": ["./vendor/memory/src/index.ts"]
     }
   },
   "include": [
