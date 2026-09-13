@@ -2,7 +2,6 @@
 
 **Person:** Alfredo  
 **Branch:** `alfredo/integrations`  
-**Läge 12/9:** lista live + 2 s poll. RLS A/B i DB OK. Teamstatus: [README.md](../../README.md#läge-kväll-11-september-2026--gren-alfredointegrations). Klick: [oauth-mcp-alfredos-steg.md](../../docs/oauth-mcp-alfredos-steg.md).  
 **Stack:** Next.js **serverfunktioner** + **MCP SDK/adapter** på **Vercel**; **Supabase** PostgreSQL + Auth/OAuth  
 **Region:** Supabase **Stockholm (`eu-north-1`)**, Vercel-backend **Stockholm (`arn1`)**  
 **Supabase:** projekt `uthkzkvpkkpzrmzjunqq` är skapat. Konton, signup-lås och Vercel-env: [docs/supabase-setup.md](../../docs/supabase-setup.md).  
