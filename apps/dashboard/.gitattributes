@@ -1,0 +1,4 @@
+# Radslut: LF i repot oavsett OS, så instruktionstexten är byte-lik på Windows och Linux.
+* text=auto eol=lf
+*.png binary
+*.ico binary
