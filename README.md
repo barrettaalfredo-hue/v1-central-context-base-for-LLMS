@@ -6,6 +6,84 @@ Privat molnminne för **Claude Desktop**. Claude väljer vad som ska sparas och 
 
 TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Python, ingen separat AI-modell, ingen worker, ingen kö, ingen Cron, ingen vektordatabas.
 
+---
+
+## Läge 12 september 2026 — gren `alfredo/integrations`
+
+Alfredos del på den här grenen är klar för V1. Det här är **inte** Filips dashboard. API:t anropar Melkers `@v1/memory`. Inte mergea till `main`.
+
+### Preview — så här kollar du
+
+Inte `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404). Inte `…-ko0vrc092` eller `…-bb720p5c9`.
+
+| Vad | Länk |
+| --- | --- |
+| **Vercel testsida** (Alfredos lista, inte Filips dashboard) | https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/ |
+| **MCP till Claude** (koppla en gång, lämna den) | `https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/api/mcp` |
+| Vercel-projekt (deployments) | https://vercel.com/barrettaalfredo-hues-projects/v1-central-context-base-for-llms |
+
+1. Öppna **testsidan**. Logga in med `alfredo.test@example.com` (tabellen nedan). Du ska se dina minnen och det gula kortet.
+2. Claude Desktop → Connectors → klistra in **MCP-länken**. Godkänn med samma konto. Byt inte URL sen.
+3. Skriv t.ex. “Vi lanserar 15 oktober i Projekt A”. Rad ska synas på testsidan utan reload.
+
+Klick i detalj: [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md).
+
+### Klart
+
+- Login, session, logout mot Supabase i Stockholm.
+- Save / search / update av minnen. Ägare = inloggning. Konto A ser inte konto B.
+- Fjärr-MCP + OAuth. Claude Desktop har sparat, sökt och uppdaterat på riktigt.
+- Testsida `/` visar nya och ändrade minnen live (gult kort).
+- MCP stängs inte av efter tid. Refresh ger tillbaka samma tokens. Koppla en gång.
+- Melkers `@v1/memory` är inkopplat. En hjärna. `apps/api/lib/memory/` är borttagen.
+
+### Vad som funkar
+
+| Anrop | Funkar |
+| --- | --- |
+| `POST /api/auth/login` med `{ "email", "password" }` | Ja. Fel lösen → `INVALID_CREDENTIALS` |
+| `GET /api/auth/session` | Ja. Inloggad `{ data: { id, email } }` eller `{ data: null }` |
+| `POST /api/auth/logout` | Ja. `{ data: { success: true } }` |
+| `POST /api/memories` / Claude `save_memory` | Ja. Skriver i Stockholm. Ägare = inloggning |
+| `GET /api/memories` / Claude `search_memory` | Ja. Filter + textsök, `updated_at` desc |
+| `PATCH /api/memories/:id` / Claude `update_memory` | Ja. 404 om saknas eller annat konto |
+| Claude Desktop → `/api/mcp` + OAuth | Ja, mot preview. Koppla en gång. Inte production |
+
+### Testkonton (förskapade, ingen registrering)
+
+Samma tre konton till testsidan `/`, Claude OAuth och (senare) Filips dashboard.
+
+| Person | E-post | Lösenord |
+|---|---|---|
+| Filip | `filip.test@example.com` | `TestFilip#2026!` |
+| Alfredo | `alfredo.test@example.com` | `TestAlfredo#2026!` |
+| Melker | `melker.test@example.com` | `TestMelker#2026!` |
+
+Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-auth.md](docs/filip-auth.md).
+
+### Inte klart här
+
+- Filips Next.js-dashboard (`filip/dashboard`).
+- Måndag: den här grenen **först** in i `integration/v1`, sen Melker, sen Filip. Tester där, inte på `main`.
+
+### SMS till teamet (kopiera)
+
+Alfredo 12/9: login, Stockholm-DB, fjärr-MCP och OAuth är klara på `alfredo/integrations`. Claude sparar/söker/uppdaterar. Testsida `/` visar det live. A/B: Filip och Melker ser inte Alfredos rader. MCP dör inte efter tid — koppla en gång mot preview-URL:en i README. Inte main (404). Filip: dashboard mot samma JSON, koppla API måndag. Melkers `@v1/memory` är inkopplat i API:t. Måndag: Alfredo först in i `integration/v1`.
+
+### PR:er som ligger inne
+
+| PR | Vad |
+| --- | --- |
+| [#2](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/2) | Login, session, logout, save/search/update mot Stockholm |
+| [#3](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/3) | Status i README |
+| [#4](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/4) | Fjärr-MCP `/api/mcp` + OAuth |
+| [#5](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/5) | OAuth följer preview-host. Publik anon-nyckel |
+| [#6](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/6) | `refresh_token` när Claude dog efter ~5 min |
+| [#7](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/7) | Stabil MCP-token. Testsida med gult kort |
+| [#9](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/9) | Live-lista (Realtime + poll) |
+| [#10](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/10) | A/B-isolering klar |
+| [#11](https://github.com/barrettaalfredo-hue/v1-central-context-base-for-LLMS/pull/11) | MCP stängs inte av. Koppla en gång |
+
 ```
 Claude Desktop  ↔  fjärr-MCP (Vercel)  ↔  minnesfunktioner (TypeScript)  ↔  Supabase
                                                       ↑

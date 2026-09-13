@@ -1,9 +1,15 @@
-# Branch `filip/dashboard`
+# Branch `alfredo/integrations`
 
-**Ägare:** Filip. Pusha bara här.
+**Ägare:** Alfredo. Pusha bara här.
 
-Du äger **`apps/dashboard/`**. Exakt vad som ska vara klart står i [apps/dashboard/README.md](apps/dashboard/README.md). Missa inte: inloggning enligt JSON-kontraktet, minneslista, sök, filter, refresh var 10:e sekund + knapp, anslutningsguide och OAuth-godkännandevy.
+## Läge 11 september 2026
 
-Självständigt: simulerade API-svar och exempelminnen från [docs/testexempel.md](docs/testexempel.md). Format: [docs/contracts.md](docs/contracts.md).
+**Klart:** Stockholm-Supabase, tre konton, RLS, Vercel, Next.js-API för login + minnen. Deployat.
 
-**Inte `main`:** måndag mergas den här grenen till **`integration/v1`** (efter Alfredo och Melker). Tester: [docs/torsdag-test.md](docs/torsdag-test.md).
+**Funkar:** Filips dashboard kan anropa `/api/auth/*` och `/api/memories*` enligt [docs/contracts.md](docs/contracts.md). Preview: https://v1-central-context-base-for-llms-ky7122wyi.vercel.app — `/` är bara testsida, inte dashboarden.
+
+**Kvar här:** Alfredo klickar Claude-connector + stänger Vercel Login på den URL Claude använder. Melkers `packages/memory` inkopplas när den finns. Steg: [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md). Filip: [docs/filip-auth.md](docs/filip-auth.md).
+
+Full status längst upp i [README.md](README.md). Leverans: [apps/api/README.md](apps/api/README.md). Setup: [docs/supabase-setup.md](docs/supabase-setup.md).
+
+**Inte `main`:** måndag mergas den här grenen **först** in i **`integration/v1`**. Tester: [docs/torsdag-test.md](docs/torsdag-test.md).
