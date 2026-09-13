@@ -32,7 +32,7 @@ npm run dev
 | POST | `/api/memories` och `/api/mcp/save_memory` | `save_memory` |
 | GET | `/api/memories` och POST `/api/mcp/search_memory` | `search_memory` |
 | PATCH | `/api/memories/:id` och POST `/api/mcp/update_memory` | `update_memory` |
-| GET | `/api/mcp` (Claude) | Fjärr-MCP, tre verktyg, OAuth |
+| GET | `/api/mcp` (Claude) | Fjärr-MCP, tre verktyg, OAuth. Token går inte ut. |
 | GET | `/oauth/authorize` | Tillfällig OAuth-vy (Filip byter UI senare) |
 
 ## Du måste leverera (annars är backend/MCP inte klar)

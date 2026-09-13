@@ -37,7 +37,7 @@ test("reuses the same MCP access and refresh tokens", () => {
   assert.deepEqual(asReusedMcpTokens({ oauth_reuse_session: reused }), reused);
 });
 
-test("MCP tokens are issued for ten years so Claude does not time out", () => {
-  assert.equal(MCP_ACCESS_SECONDS, 10 * 365 * 24 * 60 * 60);
+test("MCP tokens are issued with a lifetime Claude will not expire", () => {
+  assert.equal(MCP_ACCESS_SECONDS, 2_147_483_647);
   assert.equal(MCP_REFRESH_SECONDS, MCP_ACCESS_SECONDS);
 });
