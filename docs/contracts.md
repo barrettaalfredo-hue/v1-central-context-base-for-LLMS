@@ -4,7 +4,7 @@ Alla tre bygger mot den här filen. Formatet är JSON för informationen och Typ
 
 Status: **LÅST** enligt 1-veckasplanen.
 
-Uppdaterad 12 september 2026 med alla tres godkännande: dubblettregel, sidstorlek, sökregler, felkoder, exportnamn och exakt tidsstämpelformat är nu dokumenterade. Inga fält har lagts till, tagits bort eller ändrats. Tilläggen beskriver beteende som körs i Melkers `@v1/memory`.
+Uppdaterad 12 september 2026 med alla tres godkännande: dubblettregel, sidstorlek, sökregler, felkoder, exportnamn och exakt tidsstämpelformat är nu dokumenterade. Inga fält har lagts till, tagits bort eller ändrats. Tilläggen beskriver beteende som redan körs i `apps/api/lib/memory/`.
 
 ## Minne (det som dashboard, MCP och hjärnan delar)
 

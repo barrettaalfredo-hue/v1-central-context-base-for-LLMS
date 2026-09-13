@@ -32,6 +32,6 @@ Redan i repot:
 
 ## Fortfarande Alfredos att sätta upp (ingen gissning i kod)
 
-- De tre kontonas riktiga e-postadresser (inte committa lösenord) — [supabase-setup.md](supabase-setup.md)
-- Nycklar i Vercel, aldrig i git. URL/ref: `https://uthkzkvpkkpzrmzjunqq.supabase.co`
+- De tre kontonas riktiga e-postadresser (inte committa lösenord)
+- Supabase-projekt-URL och nycklar via miljövariabler, aldrig i git
 - Publik MCP-adress till anslutningsguiden
