@@ -6,6 +6,39 @@ Privat molnminne för **Claude Desktop**. Claude väljer vad som ska sparas och 
 
 TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Python, ingen separat AI-modell, ingen worker, ingen kö, ingen Cron, ingen vektordatabas.
 
+---
+
+## Läge 13 september 2026 — gren `integration/v1`
+
+De tre leveranserna mergas hit. Inte `main` förrän [docs/torsdag-test.md](docs/torsdag-test.md) är grön.
+
+| Del | Kommer från | Status |
+| --- | --- | --- |
+| `apps/api/` | `alfredo/integrations` | Auth, RLS, fjärr-MCP, anropar Melkers `@v1/memory` |
+| `packages/memory/` | `melker/memory` | Regler, sök, dubbletter |
+| `apps/dashboard/` | `filip/dashboard` | Inloggning, lista, sök, anslutningsguide. `API_BASE_URL` → Alfredos API |
+
+### Preview och MCP
+
+Inte `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404). Inte `…-ko0vrc092` eller `…-bb720p5c9`.
+
+| Vad | Länk |
+| --- | --- |
+| **API-testsida** (Alfredos lista) | https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/ |
+| **MCP till Claude** | `https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/api/mcp` |
+| Vercel API-projekt | https://vercel.com/barrettaalfredo-hues-projects/v1-central-context-base-for-llms |
+
+Dashboarden behöver ett **eget** Vercel-projekt, Root Directory `apps/dashboard`, branch `integration/v1`, `API_BASE_URL` = API-preview utan avslutande `/`.
+
+### Testkonton (förskapade, ingen registrering)
+
+| Person | E-post | Lösenord |
+|---|---|---|
+| Filip | `filip.test@example.com` | `TestFilip#2026!` |
+| Alfredo | `alfredo.test@example.com` | `TestAlfredo#2026!` |
+| Melker | `melker.test@example.com` | `TestMelker#2026!` |
+
+Env-namn: [docs/supabase-setup.md](docs/supabase-setup.md). Filip: [docs/filip-auth.md](docs/filip-auth.md). MCP-klick: [docs/oauth-mcp-alfredos-steg.md](docs/oauth-mcp-alfredos-steg.md).
 ```
 Claude Desktop  ↔  fjärr-MCP (Vercel)  ↔  minnesfunktioner (TypeScript)  ↔  Supabase
                                                       ↑

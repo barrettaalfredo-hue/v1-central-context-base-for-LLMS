@@ -1,0 +1,135 @@
+import { createMcpHandler, withMcpAuth } from "mcp-handler";
+import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js";
+import { createMemoryApi, createSupabaseStore } from "@v1/memory";
+import { z } from "zod";
+import { getMcpSession, supabaseAccessForMcp } from "@/lib/oauth/sessions";
+import { createSupabaseUserClient } from "@/lib/supabase/clients";
+
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
+
+function jsonTool(result: { data?: unknown; error?: { code: string; message: string } }) {
+  if (result && "error" in result && result.error) {
+    return {
+      isError: true as const,
+      content: [{ type: "text" as const, text: JSON.stringify({ error: result.error }) }],
+    };
+  }
+  if (result && "data" in result && result.data !== undefined) {
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(result.data) }],
+    };
+  }
+  return {
+    isError: true as const,
+    content: [
+      {
+        type: "text" as const,
+        text: JSON.stringify({ error: { code: "SAVE_FAILED", message: "Kunde inte spara minnet." } }),
+      },
+    ],
+  };
+}
+
+function userClient(extra: { authInfo?: AuthInfo }) {
+  const token = extra.authInfo?.token;
+  if (!token) throw new Error("UNAUTHENTICATED");
+  return createSupabaseUserClient(token);
+}
+
+function mcpUserId(extra: { authInfo?: AuthInfo }) {
+  const id = extra.authInfo?.extra?.userId;
+  if (typeof id !== "string" || !id) throw new Error("UNAUTHENTICATED");
+  return id;
+}
+
+function memoryApi(extra: { authInfo?: AuthInfo }) {
+  return createMemoryApi(createSupabaseStore(userClient(extra)));
+}
+
+const handler = createMcpHandler(
+  (server) => {
+    server.tool(
+      "save_memory",
+      "Spara ett minne för den inloggade användaren.",
+      {
+        project: z.string().min(1).max(100),
+        category: z.enum(["fact", "decision", "goal", "deadline", "preference"]),
+        title: z.string().min(1).max(150),
+        content: z.string().min(1).max(10_000),
+      },
+      async (input, extra) => jsonTool(await memoryApi(extra).saveMemory(mcpUserId(extra), input)),
+    );
+
+    server.tool(
+      "search_memory",
+      "Sök den inloggade användarens minnen. Tom lista är giltig.",
+      {
+        project: z.string().max(100).optional(),
+        category: z.enum(["fact", "decision", "goal", "deadline", "preference"]).optional(),
+        query: z.string().optional(),
+        offset: z.number().int().min(0).optional(),
+      },
+      async (input, extra) => jsonTool(await memoryApi(extra).searchMemory(mcpUserId(extra), input)),
+    );
+
+    server.tool(
+      "update_memory",
+      "Uppdatera ett befintligt minne som tillhör den inloggade användaren.",
+      {
+        id: z.string().uuid(),
+        project: z.string().min(1).max(100),
+        category: z.enum(["fact", "decision", "goal", "deadline", "preference"]),
+        title: z.string().min(1).max(150),
+        content: z.string().min(1).max(10_000),
+      },
+      async (input, extra) => jsonTool(await memoryApi(extra).updateMemory(mcpUserId(extra), input)),
+    );
+  },
+  { serverInfo: { name: "v1-memory", version: "0.1.0" } },
+  { basePath: "/api", disableSse: true, maxDuration: 60 },
+);
+
+const verifyToken = async (
+  _req: Request,
+  bearerToken?: string,
+): Promise<AuthInfo | undefined> => {
+  if (!bearerToken) return undefined;
+
+  const session = await getMcpSession(bearerToken);
+  if (session) {
+    let supabaseAccess = await supabaseAccessForMcp(bearerToken, session);
+    let supabase = createSupabaseUserClient(supabaseAccess);
+    let { data, error } = await supabase.auth.getUser(supabaseAccess);
+    if (error || !data.user) {
+      supabaseAccess = await supabaseAccessForMcp(bearerToken, session, true);
+      supabase = createSupabaseUserClient(supabaseAccess);
+      ({ data, error } = await supabase.auth.getUser(supabaseAccess));
+    }
+    if (error || !data.user) return undefined;
+    return {
+      token: supabaseAccess,
+      scopes: ["memory"],
+      clientId: data.user.id,
+      extra: { userId: data.user.id, email: data.user.email },
+    };
+  }
+
+  const supabase = createSupabaseUserClient(bearerToken);
+  const { data, error } = await supabase.auth.getUser(bearerToken);
+  if (error || !data.user) return undefined;
+  return {
+    token: bearerToken,
+    scopes: ["memory"],
+    clientId: data.user.id,
+    extra: { userId: data.user.id, email: data.user.email },
+  };
+};
+
+const authHandler = withMcpAuth(handler, verifyToken, {
+  required: true,
+  requiredScopes: ["memory"],
+  resourceMetadataPath: "/.well-known/oauth-protected-resource",
+});
+
+export { authHandler as GET, authHandler as POST, authHandler as DELETE };

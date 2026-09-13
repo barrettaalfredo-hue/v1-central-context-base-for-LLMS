@@ -2,11 +2,38 @@
 
 **Person:** Alfredo  
 **Branch:** `alfredo/integrations`  
+**Läge 12/9:** lista live + 2 s poll. RLS A/B i DB OK. Teamstatus: [README.md](../../README.md#läge-kväll-11-september-2026--gren-alfredointegrations). Klick: [oauth-mcp-alfredos-steg.md](../../docs/oauth-mcp-alfredos-steg.md).  
 **Stack:** Next.js **serverfunktioner** + **MCP SDK/adapter** på **Vercel**; **Supabase** PostgreSQL + Auth/OAuth  
-**Region:** Supabase **Stockholm**, Vercel-backend **Stockholm**  
+**Region:** Supabase **Stockholm (`eu-north-1`)**, Vercel-backend **Stockholm (`arn1`)**  
+**Supabase:** projekt `uthkzkvpkkpzrmzjunqq` är skapat. Konton, signup-lås och Vercel-env: [docs/supabase-setup.md](../../docs/supabase-setup.md).  
 **Arbetar självständigt med:** förutbestämda minnessvar (exakt JSON från [docs/testexempel.md](../../docs/testexempel.md)) medan du bygger riktig Auth, databasåtkomst och MCP.
 
-Måndag anropar du Melkers funktioner i `packages/memory/` i stället för förutbestämda svar. MCP-ytan ska då vara oförändrad.
+API:t anropar Melkers `@v1/memory`. Vercel Root Directory är `apps/api`, så paketet ligger i `vendor/memory` (`file:./vendor/memory`). Källan är fortfarande `packages/memory`. Ingen kopia i `lib/memory/`. MCP-ytan är oförändrad.
+
+## Hur du kör (den här mappen)
+
+I Vercel: **Root Directory = `apps/api`**. Region `arn1` står i `vercel.json`. Env-namn: [docs/supabase-setup.md](../../docs/supabase-setup.md).
+
+```bash
+cd apps/api
+cp .env.example .env.local   # fyll anon-nyckeln, inte service_role
+npm install
+npm test
+npm run dev
+```
+
+Öppna `/` — det är **Alfredos testyta**, inte Filips dashboard. Logga in med ett förskapat konto, spara Lanseringsdatum, sök, logga in som konto 2 och kontrollera att listan är tom.
+
+| Metod | Sökväg | Kontrakt |
+| --- | --- | --- |
+| POST | `/api/auth/login` | `{ email, password }` → `data` eller `INVALID_CREDENTIALS` |
+| GET | `/api/auth/session` | `data` eller `null` |
+| POST | `/api/auth/logout` | `{ data: { success: true } }` |
+| POST | `/api/memories` och `/api/mcp/save_memory` | `save_memory` |
+| GET | `/api/memories` och POST `/api/mcp/search_memory` | `search_memory` |
+| PATCH | `/api/memories/:id` och POST `/api/mcp/update_memory` | `update_memory` |
+| GET | `/api/mcp` (Claude) | Fjärr-MCP, tre verktyg, OAuth |
+| GET | `/oauth/authorize` | Tillfällig OAuth-vy (Filip byter UI senare) |
 
 ## Du måste leverera (annars är backend/MCP inte klar)
 
@@ -70,11 +97,13 @@ Tills Melker är inkopplad: returnera förutbestämda svar som **bit för bit** 
 
 ## Klart på din gren när
 
-- [ ] Tre konton finns; inloggnings-JSON stämmer
-- [ ] RLS-test: Konto B ser inte Konto A
-- [ ] MCP `save_memory` / `search_memory` / `update_memory` svarar enligt kontraktet (stub eller riktig DB)
-- [ ] MCP-URL + OAuth-flöde går att genomföra mot Claude Desktop (eller dokumenterat med screenshot/steg om Desktop strular)
-- [ ] Stockholm-region är satt; ingen publik cache av minnen
-- [ ] Felvägar returnerar `error`, aldrig fejk-lycka
+- [x] Tre konton finns; inloggnings-JSON stämmer
+- [x] A/B: Konto A sparar. Filip/Melker ser inte raden och kan inte uppdatera den
+- [x] MCP-verktygen finns som HTTP-JSON **och** `/api/mcp` (Claude-protokoll)
+- [x] Claude Desktop kopplade mot preview (OAuth + tre verktyg). Koppla om mot senaste preview
+- [x] Testsida: live + var 2:e sekund + vid fokus
+- [x] Stockholm-region är satt; ingen publik cache av minnen
+- [x] Felvägar returnerar `error`, aldrig fejk-lycka
+- [x] `@v1/memory` via `file:./vendor/memory` + `transpilePackages` (källa `packages/memory`)
 
 Måndag mergas den här grenen **först** in i **`integration/v1`**. Inte direkt till `main`.
