@@ -11,7 +11,11 @@ import { CLAUDE_INSTRUCTIONS } from "../lib/claude-instructions";
  */
 describe("anslutningsguidens instruktionstext", () => {
   it("är byte-lik kodblocket i docs/claude-instruktioner.md", () => {
-    const doc = readFileSync(join(__dirname, "../../../docs/claude-instruktioner.md"), "utf8");
+    // Windows-git checkar ut med CRLF (core.autocrlf=true). Normalisera före jämförelse.
+    const doc = readFileSync(join(__dirname, "../../../docs/claude-instruktioner.md"), "utf8").replace(
+      /\r\n/g,
+      "\n",
+    );
     const match = doc.match(/^```\n([\s\S]*?)\n```/m);
     assert.ok(match, "hittade inget kodblock i docs/claude-instruktioner.md");
     assert.equal(CLAUDE_INSTRUCTIONS, match[1]);
