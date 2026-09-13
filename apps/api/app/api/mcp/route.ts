@@ -2,7 +2,8 @@ import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import type { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js";
 import { createMemoryApi, createSupabaseStore } from "@v1/memory";
 import { z } from "zod";
-import { getMcpSession, supabaseAccessForMcp } from "@/lib/oauth/sessions";
+import { createMcpTokenStore } from "@/lib/oauth/mcp-memory-store";
+import { getMcpSession } from "@/lib/oauth/sessions";
 import { createSupabaseUserClient } from "@/lib/supabase/clients";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +45,10 @@ function mcpUserId(extra: { authInfo?: AuthInfo }) {
 }
 
 function memoryApi(extra: { authInfo?: AuthInfo }) {
+  const mcpAccess = extra.authInfo?.extra?.mcpAccess;
+  if (typeof mcpAccess === "string" && mcpAccess) {
+    return createMemoryApi(createMcpTokenStore(mcpAccess));
+  }
   return createMemoryApi(createSupabaseStore(userClient(extra)));
 }
 
@@ -98,20 +103,11 @@ const verifyToken = async (
 
   const session = await getMcpSession(bearerToken);
   if (session) {
-    let supabaseAccess = await supabaseAccessForMcp(bearerToken, session);
-    let supabase = createSupabaseUserClient(supabaseAccess);
-    let { data, error } = await supabase.auth.getUser(supabaseAccess);
-    if (error || !data.user) {
-      supabaseAccess = await supabaseAccessForMcp(bearerToken, session, true);
-      supabase = createSupabaseUserClient(supabaseAccess);
-      ({ data, error } = await supabase.auth.getUser(supabaseAccess));
-    }
-    if (error || !data.user) return undefined;
     return {
-      token: supabaseAccess,
+      token: bearerToken,
       scopes: ["memory"],
-      clientId: data.user.id,
-      extra: { userId: data.user.id, email: data.user.email },
+      clientId: session.user_id,
+      extra: { userId: session.user_id, mcpAccess: bearerToken },
     };
   }
 

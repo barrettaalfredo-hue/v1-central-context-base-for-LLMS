@@ -6,8 +6,9 @@ import { createSupabaseAnonClient } from "@/lib/supabase/clients";
 export type { McpSession } from "@/lib/oauth/session-parse";
 export { asMcpSession } from "@/lib/oauth/session-parse";
 
-export const MCP_ACCESS_SECONDS = 10 * 365 * 24 * 60 * 60;
-export const MCP_REFRESH_SECONDS = 10 * 365 * 24 * 60 * 60;
+/** Max signed 32-bit seconds. Claude treats this as "does not expire". */
+export const MCP_ACCESS_SECONDS = 2_147_483_647;
+export const MCP_REFRESH_SECONDS = 2_147_483_647;
 
 const supabaseRefreshInflight = new Map<string, Promise<{ access: string; refresh: string } | null>>();
 const mcpRefreshInflight = new Map<string, Promise<IssuedTokens | null>>();
