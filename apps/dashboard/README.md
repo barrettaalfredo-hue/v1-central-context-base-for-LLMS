@@ -9,7 +9,7 @@
 
 ```bash
 cd apps/dashboard
-npm install
+npm install --include=dev   # --include=dev krävs om NODE_ENV=production är satt globalt (Filips dator)
 npm run dev        # http://localhost:3000
 npm test           # 11 tester: kontrakt mot mock-lagringen + instruktionstext mot docs
 npm run build      # samma build som Vercel kör
@@ -103,6 +103,14 @@ Grenen mergas till **`integration/v1`** efter Alfredo och Melker. Inte direkt ti
 Sätt `API_BASE_URL` till previewen från `integration/v1` och kör listan i
 [docs/torsdag-test.md](../../docs/torsdag-test.md).
 
-Otestat till dess: Supabases riktiga cookies (`sb-…-auth-token`, ibland uppdelade i `.0`/`.1`)
-genom proxyn. Mekanismen är verifierad med mock-cookies; alla `Set-Cookie` vidarebefordras
-oförändrade. Om något ändå strular är fallback att lägga dashboarden som sidor i `apps/api`.
+Verifierat 13/9 från Filips dator mot Alfredos preview (`alfredo/integrations`), med
+`API_BASE_URL` satt och Filips testkonto: fel lösen → `INVALID_CREDENTIALS`; login sätter
+Supabases riktiga cookie `sb-…-auth-token` på dashboardens origin via proxyn; session, ren
+lista, POST (201), identisk omsparning (samma `id` och `updated_at`), sök `query=typescript`,
+`category=Beslut` → `INVALID_CATEGORY`, `project=Projekt a` → `[]`, PATCH samma `id`,
+PATCH påhittat `id` → 404 `NOT_FOUND` med låst text. I webbläsaren: inloggning, lista med
+svenska etiketter och samma `id`, ny rad synlig inom 10 s utan klick, anslutningsguiden med
+härledd MCP-adress.
+
+Återstår för test 14-16: samma sak mot previewen för **`integration/v1`** (efter merge), och
+Claude via MCP i stället för curl.
