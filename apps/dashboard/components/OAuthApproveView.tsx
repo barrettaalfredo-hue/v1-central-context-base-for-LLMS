@@ -37,6 +37,23 @@ export const OAUTH_ERROR_TEXT: Record<string, string> = {
 const input =
   "w-full rounded-md border border-line bg-panel px-3 py-2 text-sm text-foreground outline-none focus:border-accent";
 
+/**
+ * Neka = standard OAuth 2.0-avslag (RFC 6749 §4.1.2.1): tillbaka till klientens redirect_uri
+ * med error=access_denied och samma state. Går inte via /oauth/approve, så Alfredos flöde
+ * behöver inte ändras. redirect_uri är redan kontrollerad mot klienten innan vyn renderas.
+ */
+export function denyUrl(redirectUri: string, state: string): string {
+  try {
+    const url = new URL(redirectUri);
+    url.searchParams.set("error", "access_denied");
+    url.searchParams.set("error_description", "Användaren nekade åtkomst.");
+    if (state) url.searchParams.set("state", state);
+    return url.toString();
+  } catch {
+    return "#";
+  }
+}
+
 export function OAuthApproveView(p: OAuthApproveProps) {
   const action = p.action ?? "/oauth/approve";
 
@@ -117,20 +134,15 @@ export function OAuthApproveView(p: OAuthApproveProps) {
               <button
                 className="flex-1 rounded-md bg-accent px-3 py-2 text-sm font-medium text-background hover:opacity-90"
                 type="submit"
-                name="decision"
-                value="approve"
               >
                 Logga in och godkänn
               </button>
-              <button
+              <a
                 className="rounded-md border border-line bg-panel px-3 py-2 text-sm text-foreground hover:bg-danger-soft"
-                type="submit"
-                name="decision"
-                value="deny"
-                formNoValidate
+                href={denyUrl(p.redirectUri, p.state)}
               >
                 Neka
-              </button>
+              </a>
             </div>
           </form>
         </>

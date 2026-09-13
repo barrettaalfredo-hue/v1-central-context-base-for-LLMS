@@ -63,7 +63,7 @@ pekar automatiskt på samma preview som API:t.
 | Inloggning | `/` | `POST /api/auth/login`. Fel lösen visar `Fel mejl eller lösenord.` med koden. Redan inloggad skickas till `/dashboard`. |
 | Minneslista | `/dashboard` | `GET /api/memories?project=&category=&query=&offset=`. Ren JSON-lista. Svenska etiketter. Senast uppdaterat först. Auto-hämtning var 10:e sekund när fliken är synlig, pausar när den är dold, plus Uppdatera-knapp. Sida 50 med Föregående/Nästa. Tom lista är ett giltigt läge. `UNAUTHENTICATED` skickar till inloggning. |
 | Anslutningsguide | `/anslut` | Fyra steg, kopieringsknappar för MCP-adress och instruktionstexten (exakt från `docs/claude-instruktioner.md`). |
-| OAuth-godkännande | `/oauth/authorize` | Samma fältnamn och action som Alfredos sida. Slutlägen: ansluten, nekad, feltext. Mock-`/oauth/approve` verifierar mot mock-kontona. |
+| OAuth-godkännande | `/oauth/authorize` | Samma fältnamn och action som Alfredos sida. Slutlägen: ansluten, feltext. Neka skickar tillbaka till klientens `redirect_uri` med `error=access_denied`. Mock-`/oauth/approve` verifierar mot mock-kontona. |
 | Utloggning | knapp i toppraden | `POST /api/auth/logout` → `{ data: { success: true } }` → tillbaka till `/`. |
 
 Fel visas alltid som text. Ett `error`-svar visas aldrig som lyckat.
@@ -76,9 +76,8 @@ med samma värden som idag (`valid`, `clientId`, `redirectUri`, `state`, `codeCh
 `codeChallengeMethod`, `email`, `errorText`). Formuläret postar till `/oauth/approve` med exakt
 samma fältnamn som nu.
 
-Ett tillägg: knappen **Neka** skickar `decision=deny`. Ditt `/oauth/approve` måste antingen
-hantera det (redirect till `redirect_uri` med `error=access_denied`) eller så tar vi bort knappen
-vid porten. Säg till vilket.
+Knappen **Neka** går inte via `/oauth/approve`. Den länkar till `redirect_uri` med
+`error=access_denied` och samma `state` (standard OAuth 2.0), så ditt flöde behöver inte ändras.
 
 Tailwind-tokens (`bg-accent`, `bg-panel`, `text-danger` osv.) definieras i `app/globals.css`.
 Kopiera `:root`-blocket dit också, annars blir vyn ostylad.

@@ -1,5 +1,6 @@
 // MOCK av /oauth/approve. Verifierar mot mock-kontona och skickar tillbaka till /oauth/authorize
-// med ?result=connected, ?result=denied eller ?error=credentials. Ingen riktig kod/token utfärdas.
+// med ?result=connected eller ?error=credentials. Ingen riktig kod/token utfärdas.
+// Neka går aldrig hit: knappen länkar direkt till redirect_uri?error=access_denied (se OAuthApproveView).
 import { NextResponse } from "next/server";
 import { findAccount } from "@/lib/mock/accounts";
 
@@ -14,11 +15,6 @@ export async function POST(request: Request) {
     if (s(key)) back.searchParams.set(key, s(key));
   }
   if (s("email")) back.searchParams.set("email", s("email"));
-
-  if (s("decision") === "deny") {
-    back.searchParams.set("result", "denied");
-    return NextResponse.redirect(back, 303);
-  }
 
   const account = findAccount(s("email"), s("password"));
   if (!account) {
