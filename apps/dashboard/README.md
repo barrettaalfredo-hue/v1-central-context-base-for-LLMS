@@ -68,6 +68,10 @@ pekar automatiskt på samma preview som API:t.
 
 Fel visas alltid som text. Ett `error`-svar visas aldrig som lyckat.
 
+På `integration/v1` visas den här UI:n från **samma** Vercel-projekt som API:t
+(`apps/api`, Root Directory oförändrad): `/`, `/dashboard`, `/anslut`. Mock och
+`API_BASE_URL`-proxy behövs inte där — samma origin.
+
 ## Till Alfredo: OAuth-vyn
 
 Utseendet ligger i `components/OAuthApproveView.tsx`, en ren serverkomponent utan hooks.

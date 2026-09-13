@@ -22,7 +22,15 @@ npm test
 npm run dev
 ```
 
-Öppna `/` — det är **Alfredos testyta**, inte Filips dashboard. Logga in med ett förskapat konto, spara Lanseringsdatum, sök, logga in som konto 2 och kontrollera att listan är tom.
+Samma Vercel-projekt (Root Directory `apps/api`) visar Filips UI och Alfredos API.
+
+| Sida | Väg |
+| --- | --- |
+| Inloggning (Filip) | `/` |
+| Minnen | `/dashboard` |
+| Anslut Claude | `/anslut` |
+| Alfredos testsida | `/test` |
+| OAuth-godkännande | `/oauth/authorize` → post till `/oauth/approve` |
 
 | Metod | Sökväg | Kontrakt |
 | --- | --- | --- |
@@ -33,7 +41,7 @@ npm run dev
 | GET | `/api/memories` och POST `/api/mcp/search_memory` | `search_memory` |
 | PATCH | `/api/memories/:id` och POST `/api/mcp/update_memory` | `update_memory` |
 | GET | `/api/mcp` (Claude) | Fjärr-MCP, tre verktyg, OAuth |
-| GET | `/oauth/authorize` | Tillfällig OAuth-vy (Filip byter UI senare) |
+| GET | `/oauth/authorize` | Filips OAuth-vy. Postar till `/oauth/approve` |
 
 ## Du måste leverera (annars är backend/MCP inte klar)
 

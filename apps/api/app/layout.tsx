@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Alfredo API — test",
-  description: "Inloggning och minnen mot Supabase. Inte Filips dashboard.",
+  title: "Claude-minne",
+  description: "Privat molnminne för Claude. Inloggning, minnen och anslutning.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

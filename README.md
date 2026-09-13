@@ -16,7 +16,7 @@ De tre leveranserna mergas hit. Inte `main` förrän [docs/torsdag-test.md](docs
 | --- | --- | --- |
 | `apps/api/` | `alfredo/integrations` | Auth, RLS, fjärr-MCP, anropar Melkers `@v1/memory` |
 | `packages/memory/` | `melker/memory` | Regler, sök, dubbletter |
-| `apps/dashboard/` | `filip/dashboard` | Inloggning, lista, sök, anslutningsguide. `API_BASE_URL` → Alfredos API |
+| `apps/dashboard/` | `filip/dashboard` | Källa för UI. Visas live från `apps/api` (`/`, `/dashboard`, `/anslut`) |
 
 ### Preview och MCP
 
@@ -24,11 +24,12 @@ Inte `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404).
 
 | Vad | Länk |
 | --- | --- |
-| **API-testsida** (Alfredos lista) | https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/ |
+| **Dashboard** (Filips UI på samma projekt) | `/` inloggning, `/dashboard` minnen, `/anslut` Claude |
+| **Alfredos testsida** | `/test` |
 | **MCP till Claude** | `https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/api/mcp` |
-| Vercel API-projekt | https://vercel.com/barrettaalfredo-hues-projects/v1-central-context-base-for-llms |
+| Vercel-projekt | https://vercel.com/barrettaalfredo-hues-projects/v1-central-context-base-for-llms |
 
-Dashboarden behöver ett **eget** Vercel-projekt, Root Directory `apps/dashboard`, branch `integration/v1`, `API_BASE_URL` = API-preview utan avslutande `/`.
+Ett Vercel-projekt. Root Directory förblir `apps/api`. Inte ett andra projekt. Inte Root Directory `apps/dashboard`.
 
 ### Testkonton (förskapade, ingen registrering)
 
