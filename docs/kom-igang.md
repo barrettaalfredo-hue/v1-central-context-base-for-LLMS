@@ -48,7 +48,7 @@ Om inloggningen failar: fel mejl/lösen, eller du är på fel URL.
 3. Klistra in adressen som fjärr-MCP (Remote MCP server). Spara.
 4. Klicka **Connect**. Ett fönster öppnas.
 5. Logga in med **samma** e-post och lösen som i dashboarden. Klicka godkänn.
-6. Skapa ett Claude-projekt. På **Anslut Claude**: kopiera instruktionerna och klistra in dem **exakt** som projektinstruktion. Inte omskrivet.
+6. Skapa ett Claude-projekt. Klistra in instruktionerna **exakt** i projektets **Instructions**, inte i Connectors och inte i chatten. Testdagen: texten från **Anslut Claude**. Annars: [claude-instruktioner-universell.md](claude-instruktioner-universell.md).
 
 Samma MCP-adress för alla. Ägaren blir den som loggar in i godkännandefönstret.
 
