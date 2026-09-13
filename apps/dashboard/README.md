@@ -2,71 +2,84 @@
 
 **Person:** Filip  
 **Branch:** `filip/dashboard`  
-**Stack:** Next.js, React, TypeScript, Tailwind, deploy på **Vercel**  
-**Arbetar självständigt med:** simulerade API-svar, inloggning och exempelminnen från [docs/testexempel.md](../../docs/testexempel.md). Mocken ska följa [docs/contracts.md](../../docs/contracts.md) **exakt**.
+**Stack:** Next.js 16, React 19, TypeScript, Tailwind 4, deploy på **Vercel** (region `arn1`, Stockholm)  
+**Kontrakt:** [docs/contracts.md](../../docs/contracts.md). Inget eget minnesformat.
 
-Måndag byts mock mot Alfredos API + Melkers funktioner. Bygg inte om vyerna då — bara anslutningen.
+## Kör lokalt
 
-## Du måste leverera (annars är dashboarden inte klar)
+```bash
+cd apps/dashboard
+npm install
+npm run dev        # http://localhost:3000
+npm test           # 9 kontraktstester mot mock-lagringen
+npm run build      # samma build som Vercel kör
+```
 
-### Sidor och beteende
+Utan miljövariabler startar dashboarden i **fristående mock-läge**. Logga in med
+`filip@example.com`, `alfredo@example.com` eller `melker@example.com` och lösenordet
+`mock-losen` (kan bytas med `MOCK_PASSWORD`). Varje mock-konto har de tre exempelminnena
+från [docs/testexempel.md](../../docs/testexempel.md) med olika `id`, så isoleringen syns.
 
-1. **Inloggning**
-   - E-post + lösenord.
-   - Request: `{ "email": "…", "password": "…" }`.
-   - Visa inloggad användare från `{ "data": { "id", "email" } }`.
-   - Fel lösenord: visa `{ "error": { "code": "INVALID_CREDENTIALS", "message": "Fel mejl eller lösenord." } }`.
-   - Ingen registreringsvy.
+Mock-lagringen lever i serverprocessen och nollställs vid omstart. Det är avsiktligt.
 
-2. **Utloggning**
-   - Vid lycka: `{ "data": { "success": true } }` och tillbaka till inloggning.
+## Två lägen, samma kod
 
-3. **Minneslista**
-   - Visa `project`, svensk kategorietikett, `title`, `content`, `updated_at`.
-   - Sortering: **senast uppdaterat först**.
-   - Tom lista är ett giltigt läge, inte ett fel.
+| Läge | `API_BASE_URL` | Vad händer med `/api/*` |
+| --- | --- | --- |
+| Fristående (mock) | tom | Dashboardens egna route handlers under `app/api/` svarar. |
+| Måndag (riktigt) | `https://<alfredos-preview>.vercel.app` | `next.config.ts` skriver om alla `/api/*` till Alfredos API på servern. Webbläsaren ser samma origin, så cookien från Supabase sätts på dashboardens domän och följer med. Ingen CORS. |
 
-4. **Sökning och filter**
-   - Textsök i titel och innehåll.
-   - Filter på `project` och `category`.
-   - Kategorier i UI: Faktum, Beslut, Mål, Deadline, Preferens (värden mot API: `fact`, `decision`, `goal`, `deadline`, `preference`).
+Vyerna anropar bara `lib/api.ts`. Bytet mock → riktigt är en miljövariabel, ingen kodändring.
 
-5. **Uppdatering av listan**
-   - Automatisk hämtning **var 10:e sekund** när fliken/sidan är aktiv.
-   - En **uppdateringsknapp** som hämtar omedelbart.
+`NEXT_PUBLIC_MCP_URL` visas i anslutningsguiden. Sätt till Alfredos `/api/mcp`.
 
-6. **Anslutningsguide (obligatorisk V1-feature)**
-   - Visa MCP-adressen så den kan kopieras.
-   - Visa var i Claude Desktop användaren lägger fjärranslutningen.
-   - Visa instruktionstexten från [docs/claude-instruktioner.md](../../docs/claude-instruktioner.md) så den kan kopieras in i Claude-projektet.
-   - Steg: logga in här → kopiera MCP-adress → godkänn åtkomst → klistra in instruktioner.
+## Vad som finns
 
-7. **OAuth-godkännandevy**
-   - Filip **äger vyn** där användaren godkänner att Claude får åtkomst.
-   - Följ samma inloggade konto. Hitta inte på ett annat konto än det som just loggade in på dashboarden.
-   - Alfredo kopplar vyn mot riktig Supabase OAuth; tills dess: simulerat godkännande som slutar i tydlig “ansluten” / “nekad” / feltext.
+| Sida | Väg | Beteende |
+| --- | --- | --- |
+| Inloggning | `/` | `POST /api/auth/login`. Fel lösen visar `Fel mejl eller lösenord.` med koden. Redan inloggad skickas till `/dashboard`. |
+| Minneslista | `/dashboard` | `GET /api/memories?project=&category=&query=&offset=`. Ren JSON-lista. Svenska etiketter. Senast uppdaterat först. Auto-hämtning var 10:e sekund när fliken är synlig, pausar när den är dold, plus Uppdatera-knapp. Sida 50 med Föregående/Nästa. Tom lista är ett giltigt läge. `UNAUTHENTICATED` skickar till inloggning. |
+| Anslutningsguide | `/anslut` | Fyra steg, kopieringsknappar för MCP-adress och instruktionstexten (exakt från `docs/claude-instruktioner.md`). |
+| OAuth-godkännande | `/oauth/authorize` | Samma fältnamn och action som Alfredos sida. Slutlägen: ansluten, nekad, feltext. Mock-`/oauth/approve` verifierar mot mock-kontona. |
+| Utloggning | knapp i toppraden | `POST /api/auth/logout` → `{ data: { success: true } }` → tillbaka till `/`. |
 
-8. **Fel**
-   - Nätverksfel, ogiltig session (`data: null`), tom sökning och auth-fel ska synas som text.
-   - Visa **aldrig** ett minne som sparat om API:t skickade `error`.
+Fel visas alltid som text. Ett `error`-svar visas aldrig som lyckat.
 
-### Mock-data du ska ha inbyggd
+## Till Alfredo: OAuth-vyn
 
-De tre exempelminnena i [docs/testexempel.md](../../docs/testexempel.md) (Lanseringsdatum, Stack för V1, Tre testkonton), med påhittade `id` och tidsstämplar i rätt format.
+Utseendet ligger i `components/OAuthApproveView.tsx`, en ren serverkomponent utan hooks.
+Kopiera filen till `apps/api/components/` och rendera den från `apps/api/app/oauth/authorize/page.tsx`
+med samma värden som idag (`valid`, `clientId`, `redirectUri`, `state`, `codeChallenge`,
+`codeChallengeMethod`, `email`, `errorText`). Formuläret postar till `/oauth/approve` med exakt
+samma fältnamn som nu.
 
-## Du ska inte bygga
+Ett tillägg: knappen **Neka** skickar `decision=deny`. Ditt `/oauth/approve` måste antingen
+hantera det (redirect till `redirect_uri` med `error=access_denied`) eller så tar vi bort knappen
+vid porten. Säg till vilket.
 
-- Python, worker, kö, Supabase-schema, MCP-server, ChatGPT.
-- Konfliktsida, versionshistorik, projekthantering (egen tabell), publik signup.
-- Eget minnesformat. Inte `topic`/`text` från gamla planen — fälten är `project`, `category`, `title`, `content`.
+Tailwind-tokens (`bg-accent`, `bg-panel`, `text-danger` osv.) definieras i `app/globals.css`.
+Kopiera `:root`-blocket dit också, annars blir vyn ostylad.
 
-## Klart på din gren när
+## Klart på grenen
 
-- [ ] Inloggning, felinloggning och utloggning följer JSON-kontraktet
-- [ ] Lista, sök, filter och 10-sekunders-refresh fungerar mot mock
-- [ ] Anslutningsguide + OAuth-vy går att klicka igenom
-- [ ] Svenska kategorietiketter stämmer
-- [ ] README i den här mappen förklarar `npm run dev` / Vercel
-- [ ] Ingen kod beror på att Alfredos eller Melkers tjänster körs
+- [x] Inloggning, felinloggning och utloggning följer JSON-kontraktet
+- [x] Lista, sök, filter och 10-sekunders-refresh fungerar mot mock
+- [x] Anslutningsguide + OAuth-vy går att klicka igenom
+- [x] Svenska kategorietiketter stämmer
+- [x] README förklarar `npm run dev` / Vercel
+- [x] Ingen kod beror på att Alfredos eller Melkers tjänster körs
 
-Måndag mergas den här grenen till **`integration/v1`** (efter Alfredo och Melker). Inte direkt till `main`.
+## Vercel
+
+Nytt Vercel-projekt med **Root Directory `apps/dashboard`**. `vercel.json` sätter region `arn1`.
+Miljövariabler: `API_BASE_URL` och `NEXT_PUBLIC_MCP_URL` (preview och production).
+
+## Måndag 14/9
+
+Grenen mergas till **`integration/v1`** efter Alfredo och Melker. Inte direkt till `main`.
+Sätt `API_BASE_URL` till previewen från `integration/v1` och kör listan i
+[docs/torsdag-test.md](../../docs/torsdag-test.md).
+
+Otestat till dess: att Supabases `Set-Cookie` via rewriten fungerar i Vercel-preview. Det är
+standardbeteende för Next-rewrites men har inte verifierats mot Alfredos preview härifrån.
+Om cookien inte fastnar är fallback att lägga dashboarden som sidor i `apps/api` (samma origin).
