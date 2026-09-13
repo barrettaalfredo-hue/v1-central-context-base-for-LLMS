@@ -10,6 +10,8 @@ TypeScript överallt. Två molntjänster: **Vercel** och **Supabase**. Ingen Pyt
 
 ## Läge 13 september 2026 — gren `integration/v1`
 
+**Teamet: börja här → [docs/kom-igang.md](docs/kom-igang.md)** (dashboard, Claude, snabbtest).
+
 De tre leveranserna mergas hit. Inte `main` förrän [docs/torsdag-test.md](docs/torsdag-test.md) är grön.
 
 | Del | Kommer från | Status |
