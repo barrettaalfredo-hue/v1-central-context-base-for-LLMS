@@ -29,7 +29,6 @@ Samma Vercel-projekt (Root Directory `apps/api`) visar Filips UI och Alfredos AP
 | Inloggning (Filip) | `/` |
 | Minnen | `/dashboard` |
 | Anslut Claude | `/anslut` |
-| Alfredos testsida | `/test` |
 | OAuth-godkännande | `/oauth/authorize` → post till `/oauth/approve` |
 
 | Metod | Sökväg | Kontrakt |

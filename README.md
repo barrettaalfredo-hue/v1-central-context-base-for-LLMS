@@ -25,7 +25,6 @@ Inte `https://v1-central-context-base-for-llms.vercel.app` (tom `main` → 404).
 | Vad | Länk |
 | --- | --- |
 | **Dashboard** (Filips UI på samma projekt) | `/` inloggning, `/dashboard` minnen, `/anslut` Claude |
-| **Alfredos testsida** | `/test` |
 | **MCP till Claude** | `https://v1-central-context-bas-git-7f4021-barrettaalfredo-hues-projects.vercel.app/api/mcp` |
 | Vercel-projekt | https://vercel.com/barrettaalfredo-hues-projects/v1-central-context-base-for-llms |
 
