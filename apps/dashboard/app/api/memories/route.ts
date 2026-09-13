@@ -4,10 +4,14 @@
 //   ej inloggad -> { error: { code: "UNAUTHENTICATED" } }, 401
 import { mockDb } from "@/lib/mock/db";
 import { currentAccount, jsonError, jsonOk } from "@/lib/mock/session";
+import { proxyToUpstream } from "@/lib/upstream";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  const up = await proxyToUpstream(request, "/api/memories");
+  if (up) return up;
+
   const account = await currentAccount();
   if (!account) return jsonError("UNAUTHENTICATED", "Inte inloggad.", 401);
 
@@ -25,6 +29,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const up = await proxyToUpstream(request, "/api/memories");
+  if (up) return up;
+
   const account = await currentAccount();
   if (!account) return jsonError("UNAUTHENTICATED", "Inte inloggad.", 401);
 

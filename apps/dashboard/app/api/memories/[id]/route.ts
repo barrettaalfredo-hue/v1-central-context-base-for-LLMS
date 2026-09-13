@@ -1,14 +1,18 @@
 // MOCK. PATCH /api/memories/:id -> uppdaterat minne, eller error-objekt.
 import { mockDb } from "@/lib/mock/db";
 import { currentAccount, jsonError, jsonOk } from "@/lib/mock/session";
+import { proxyToUpstream } from "@/lib/upstream";
 
 export const dynamic = "force-dynamic";
 
 export async function PATCH(request: Request, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
+  const up = await proxyToUpstream(request, `/api/memories/${encodeURIComponent(id)}`);
+  if (up) return up;
+
   const account = await currentAccount();
   if (!account) return jsonError("UNAUTHENTICATED", "Inte inloggad.", 401);
 
-  const { id } = await ctx.params;
   let body: Record<string, unknown>;
   try {
     body = await request.json();

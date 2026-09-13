@@ -11,7 +11,7 @@
 cd apps/dashboard
 npm install
 npm run dev        # http://localhost:3000
-npm test           # 9 kontraktstester mot mock-lagringen
+npm test           # 11 tester: kontrakt mot mock-lagringen + instruktionstext mot docs
 npm run build      # samma build som Vercel kör
 ```
 
@@ -26,12 +26,35 @@ Mock-lagringen lever i serverprocessen och nollställs vid omstart. Det är avsi
 
 | Läge | `API_BASE_URL` | Vad händer med `/api/*` |
 | --- | --- | --- |
-| Fristående (mock) | tom | Dashboardens egna route handlers under `app/api/` svarar. |
-| Måndag (riktigt) | `https://<alfredos-preview>.vercel.app` | `next.config.ts` skriver om alla `/api/*` till Alfredos API på servern. Webbläsaren ser samma origin, så cookien från Supabase sätts på dashboardens domän och följer med. Ingen CORS. |
+| Fristående (mock) | tom | Route-filerna under `app/api/` svarar själva med mock-lagringen. |
+| Måndag (riktigt) | `https://<preview för integration/v1>` | Samma route-filer skickar anropet vidare till Alfredos API via `lib/upstream.ts`. Webbläsaren ser bara dashboardens origin, så Supabases `Set-Cookie` sätts på dashboardens domän och följer med i nästa anrop. Ingen CORS behövs (Alfredos API har ingen). |
 
 Vyerna anropar bara `lib/api.ts`. Bytet mock → riktigt är en miljövariabel, ingen kodändring.
 
-`NEXT_PUBLIC_MCP_URL` visas i anslutningsguiden. Sätt till Alfredos `/api/mcp`.
+Proxyn är testad end-to-end lokalt med två instanser (en som spelar Alfredos API): login-cookie
+sätts via proxyn, session/lista/PATCH/logout går igenom, felobjekt passerar oförändrade.
+Upstream nere ger `UPSTREAM_UNREACHABLE` (502). Upstream som svarar HTML (t.ex. Vercels
+inloggningssida vid Deployment Protection) ger `UPSTREAM_NOT_JSON` (502) med tydlig text.
+
+`VERCEL_PROTECTION_BYPASS`: om Alfredos preview är skyddad, sätt hemligheten från hans
+Vercel-projekt här. Proxyn skickar den som `x-vercel-protection-bypass`.
+
+`NEXT_PUBLIC_MCP_URL` visas i anslutningsguiden. Tomt = `API_BASE_URL` + `/api/mcp`, så den
+pekar automatiskt på samma preview som API:t.
+
+## Kompatibilitet med Alfredo och Melker (kontrollerat 13/9 mot deras grenar)
+
+| Krav | Källa | Dashboard |
+| --- | --- | --- |
+| `GET /api/memories` är en ren lista, inte `{ data }` | Alfredo `jsonOk(result.data)`, Melkers överlämning | `lib/api.ts` läser listan direkt |
+| Login/session ger `{ data: { id, email } }` eller `{ data: null }` | Alfredo `auth/*` | `useSession`, login-sidan |
+| 401 `UNAUTHENTICATED` när sessionen dött | Alfredo `requireUser()` | Skickar till inloggning |
+| PATCH `/api/memories/:id`, 404 `NOT_FOUND` med låst text | Alfredo `[id]/route.ts` | Mock speglar exakt |
+| Kategorier gemener mot API, svenska etiketter i UI | contracts.md | `CATEGORY_LABELS` |
+| Instruktionstexten byte-lik `docs/claude-instruktioner.md` (nya blocket, inte enradaren) | torsdag-test 13 och 16 | `test/instructions.test.ts` faller vid drift |
+| Tom lista visas som tom, inte mock-rader (test 8, 15) | torsdag-test | Mock används aldrig när `API_BASE_URL` är satt |
+| Same origin, `credentials: "include"` | filip-auth.md | Proxy i `lib/upstream.ts` |
+| OAuth-vyn: samma fältnamn/action som Alfredos sida | Alfredo `oauth/authorize/page.tsx` | `components/OAuthApproveView.tsx` |
 
 ## Vad som finns
 
@@ -72,7 +95,7 @@ Kopiera `:root`-blocket dit också, annars blir vyn ostylad.
 ## Vercel
 
 Nytt Vercel-projekt med **Root Directory `apps/dashboard`**. `vercel.json` sätter region `arn1`.
-Miljövariabler: `API_BASE_URL` och `NEXT_PUBLIC_MCP_URL` (preview och production).
+Miljövariabler: `API_BASE_URL`, ev. `VERCEL_PROTECTION_BYPASS`, ev. `NEXT_PUBLIC_MCP_URL`.
 
 ## Måndag 14/9
 
@@ -80,6 +103,6 @@ Grenen mergas till **`integration/v1`** efter Alfredo och Melker. Inte direkt ti
 Sätt `API_BASE_URL` till previewen från `integration/v1` och kör listan i
 [docs/torsdag-test.md](../../docs/torsdag-test.md).
 
-Otestat till dess: att Supabases `Set-Cookie` via rewriten fungerar i Vercel-preview. Det är
-standardbeteende för Next-rewrites men har inte verifierats mot Alfredos preview härifrån.
-Om cookien inte fastnar är fallback att lägga dashboarden som sidor i `apps/api` (samma origin).
+Otestat till dess: Supabases riktiga cookies (`sb-…-auth-token`, ibland uppdelade i `.0`/`.1`)
+genom proxyn. Mekanismen är verifierad med mock-cookies; alla `Set-Cookie` vidarebefordras
+oförändrade. Om något ändå strular är fallback att lägga dashboarden som sidor i `apps/api`.
